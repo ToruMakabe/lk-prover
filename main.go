@@ -10,28 +10,57 @@ import (
 
 const inputFormatMsg = "Please input n^2 * n^2 numbers 0 or 1-9 delimitted by conma. 0 is empty as Sudoku cell."
 
-func prover() int {
-	fmt.Print("Antecedent? ")
+type node struct {
+	parent *node
+	left   []string
+	right  []string
+	child  []node
+	valid  bool
+}
+
+func evalProp(n node) bool {
+	return true
+}
+
+func parse(r node, n node) int {
+	e := evalProp(r)
+	if e == false {
+		r.valid = false
+	}
+	for _, c := range n.child {
+		parse(r, c)
+	}
+
+	return 0
+}
+
+func prove() int {
+	fmt.Print("Sequent? ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	as := strings.Split(scanner.Text(), ",")
+	s := strings.Split(scanner.Text(), "|-")
+
+	as := strings.Split(s[0], ",")
 	var antecedents []string
 	for _, a := range as {
 		antecedents = append(antecedents, strings.Join(strings.Fields(a), ""))
 	}
-	fmt.Println("input is", antecedents)
+	fmt.Println("Antecedents: ", antecedents)
 
-	fmt.Print("Consequent? ")
-	scanner = bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	cs := strings.Split(scanner.Text(), ",")
+	cs := strings.Split(s[1], ",")
 	var consequents []string
 	for _, c := range cs {
 		consequents = append(consequents, strings.Join(strings.Fields(c), ""))
 	}
-	fmt.Println("input is", consequents)
+	fmt.Println("Consequents: ", consequents)
 
 	st := time.Now()
+
+	root := node{nil, antecedents, consequents, nil, false}
+	fmt.Println("Root: ", root)
+
+	parse(root, root)
+
 	// 処理時間を表示する.
 	et := time.Now()
 	fmt.Println("Time: ", et.Sub(st))
@@ -44,5 +73,5 @@ func printError(err error) {
 }
 
 func main() {
-	os.Exit(prover())
+	os.Exit(prove())
 }
