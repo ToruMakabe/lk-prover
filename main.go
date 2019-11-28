@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -32,6 +33,14 @@ func isValid(a []string, c []string) bool {
 	return false
 }
 
+func decompose(l string, p string, a []string, c []string) []string {
+	// ToDo: Nagation case
+
+	re := regexp.MustCompile(`^\s*(~?[A-Z!])\s*(->|\^|v)\s*(~?[A-Z!])\s*$`)
+	pf := re.FindStringSubmatch(l)
+	return pf
+}
+
 func evalProp(n *node) bool {
 	a := n.antecedents
 	c := n.consequents
@@ -40,6 +49,12 @@ func evalProp(n *node) bool {
 		return true
 	}
 
+	for _, s := range a {
+		d := decompose(s, "l", a, c)
+		if d != nil {
+			fmt.Printf("Proposotional Formula: %s %s %s\n", d[1], d[2], d[3])
+		}
+	}
 	return false
 }
 
