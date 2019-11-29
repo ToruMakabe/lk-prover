@@ -20,12 +20,23 @@ type node struct {
 }
 
 func isValid(a []string, c []string) bool {
-	m := make(map[string]bool)
+	m1 := make(map[string]bool)
+	m2 := make(map[string]bool)
 	var s []string
-	s = append(a, c...)
+	var u []string
+
+	s = append(a)
 	for _, e := range s {
-		if !m[e] {
-			m[e] = true
+		if !m1[e] {
+			m1[e] = true
+			u = append(u, e)
+		}
+	}
+
+	s = append(u, c...)
+	for _, e := range s {
+		if !m2[e] {
+			m2[e] = true
 		} else {
 			return true
 		}
@@ -33,15 +44,39 @@ func isValid(a []string, c []string) bool {
 	return false
 }
 
-func decompose(l string, p string, a []string, c []string) []string {
+func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string) {
 	// ToDo: Nagation case
 
-	re := regexp.MustCompile(`^\s*(~?[A-Z!])\s*(->|\^|v)\s*(~?[A-Z!])\s*$`)
+	re := regexp.MustCompile(`^\s*(~?[A-Z!])\s*(->|\|{2}|&&)\s*(~?[A-Z!])\s*$`)
 	pf := re.FindStringSubmatch(l)
-	return pf
+	if pf == nil {
+		return "", nil, nil
+	}
+
+	lc := pf[2]
+	v1 := pf[1]
+	v2 := pf[3]
+
+	var rv1 [][]string
+	var rv2 [][]string
+
+	switch lc {
+	case "->":
+		if p == "l" {
+			rv1 = append(rv1, a)
+			rv1 = append(rv1, append(c, v1))
+			rv2 = append(rv2, append(a, v2))
+			rv2 = append(rv2, c)
+			return "->L", rv1, rv2
+		}
+		rv1 = append(rv1, append(a, v1))
+		rv1 = append(rv1, append(c, v2))
+		return "->R", rv1, rv2
+	}
+	return "", nil, nil
 }
 
-func evalProp(n *node) bool {
+func evalProp(n node) bool {
 	a := n.antecedents
 	c := n.consequents
 	if isValid(a, c) {
@@ -49,23 +84,26 @@ func evalProp(n *node) bool {
 		return true
 	}
 
-	for _, s := range a {
-		d := decompose(s, "l", a, c)
-		if d != nil {
-			fmt.Printf("Proposotional Formula: %s %s %s\n", d[1], d[2], d[3])
+	for i, s := range a {
+		t := append(a[:i], a[i+1:]...)
+		lc, d1, d2 := decompose(s, "l", t, c)
+		if lc != "" {
+			fmt.Printf("Proposotional Formula: %s %s %s\n", lc, d1, d2)
 		}
 	}
 	return false
 }
 
 func parse(r *node, n *node) int {
-	e := evalProp(r)
+	e := evalProp(*r)
 	if e == false {
 		r.valid = false
 	}
-	for _, c := range n.child {
-		parse(r, &c)
-	}
+	/*
+		for _, c := range n.child {
+			parse(r, &c)
+		}
+	*/
 
 	return 0
 }
