@@ -85,7 +85,9 @@ func evalProp(n node) bool {
 	}
 
 	for i, s := range a {
-		t := append(a[:i], a[i+1:]...)
+		var t []string
+		t = append(t, a[:i]...)
+		t = append(t, a[i+1:]...)
 		lc, d1, d2 := decompose(s, "l", t, c)
 		if lc != "" {
 			fmt.Printf("Proposotional Formula: %s %s %s\n", lc, d1, d2)
@@ -109,6 +111,7 @@ func parse(r *node, n *node) int {
 }
 
 func prove() int {
+
 	fmt.Print("Sequent? ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
@@ -127,6 +130,11 @@ func prove() int {
 		consequents = append(consequents, c)
 	}
 	fmt.Println("Consequents: ", consequents)
+
+	/* Test
+	antecedents := []string{"A", "A->B", "A"}
+	consequents := []string{"B"}
+	*/
 
 	st := time.Now()
 
