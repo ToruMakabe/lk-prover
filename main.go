@@ -131,11 +131,6 @@ func prove() int {
 	}
 	fmt.Println("Consequents: ", consequents)
 
-	/* Test
-	antecedents := []string{"A", "A->B", "A"}
-	consequents := []string{"B"}
-	*/
-
 	st := time.Now()
 
 	root := node{nil, antecedents, consequents, nil, false}
