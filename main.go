@@ -132,10 +132,8 @@ func evalProp(n *node) bool {
 		if conn != "" {
 			n.conn = conn
 			fmt.Printf("Proposotional Formula: %s %s %s\n", conn, d1, d2)
-			if d1 != nil {
-				child := node{n, d1[0], d1[1], "", nil, false}
-				n.child = append(n.child, &child)
-			}
+			child := node{n, d1[0], d1[1], "", nil, false}
+			n.child = append(n.child, &child)
 			if d2 != nil {
 				child := node{n, d2[0], d2[1], "", nil, false}
 				n.child = append(n.child, &child)
