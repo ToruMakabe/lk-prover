@@ -20,25 +20,23 @@ type node struct {
 }
 
 func isValid(a []string, c []string) bool {
-	m1 := make(map[string]bool)
-	m2 := make(map[string]bool)
+	m := make(map[string]bool)
 	var s []string
 	var u []string
 
 	s = append(a)
 	for _, e := range s {
-		if !m1[e] {
-			m1[e] = true
+		if !m[e] {
+			m[e] = true
 			u = append(u, e)
 		}
 	}
 
-	s = append(u, c...)
-	for _, e := range s {
-		if !m2[e] {
-			m2[e] = true
-		} else {
-			return true
+	for _, i := range u {
+		for _, j := range c {
+			if i == j {
+				return true
+			}
 		}
 	}
 	return false
@@ -80,7 +78,6 @@ func evalProp(n node) bool {
 	a := n.antecedents
 	c := n.consequents
 	if isValid(a, c) {
-		n.valid = true
 		return true
 	}
 
@@ -98,8 +95,8 @@ func evalProp(n node) bool {
 
 func parse(r *node, n *node) int {
 	e := evalProp(*r)
-	if e == false {
-		r.valid = false
+	if e == true {
+		r.valid = true
 	}
 	/*
 		for _, c := range n.child {
@@ -130,6 +127,10 @@ func prove() int {
 		consequents = append(consequents, c)
 	}
 	fmt.Println("Consequents: ", consequents)
+
+	// Debug
+	// antecedents := []string{"A", "A->B", "A"}
+	// consequents := []string{"A"}
 
 	st := time.Now()
 
