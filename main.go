@@ -15,7 +15,8 @@ type node struct {
 	parent      *node
 	antecedents []string
 	consequents []string
-	child       []node
+	conn        string
+	child       []*node
 	valid       bool
 }
 
@@ -51,14 +52,14 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 		return "", nil, nil
 	}
 
-	lc := pf[2]
+	conn := pf[2]
 	v1 := pf[1]
 	v2 := pf[3]
 
 	var rv1 [][]string
 	var rv2 [][]string
 
-	switch lc {
+	switch conn {
 	case "->":
 		if p == "l" {
 			rv1 = append(rv1, a)
@@ -69,12 +70,34 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 		}
 		rv1 = append(rv1, append(a, v1))
 		rv1 = append(rv1, append(c, v2))
-		return "->R", rv1, rv2
+		return "->R", rv1, nil
+	case "&&":
+		if p == "l" {
+			rv1 = append(rv1, append(a, v1, v2))
+			rv1 = append(rv1, c)
+			return "&&L", rv1, nil
+		}
+		rv1 = append(rv1, a)
+		rv1 = append(rv1, []string{v1})
+		rv2 = append(rv2, c)
+		rv2 = append(rv2, []string{v2})
+		return "&&R", rv1, rv2
+	case "||":
+		if p == "l" {
+			rv1 = append(rv1, a)
+			rv1 = append(rv1, []string{v1})
+			rv2 = append(rv2, c)
+			rv2 = append(rv2, []string{v2})
+			return "||L", rv1, rv2
+		}
+		rv1 = append(rv1, a)
+		rv1 = append(rv1, append(c, v1, v2))
+		return "||R", rv1, nil
 	}
 	return "", nil, nil
 }
 
-func evalProp(n node) bool {
+func evalProp(n *node) bool {
 	a := n.antecedents
 	c := n.consequents
 	if isValid(a, c) {
@@ -85,16 +108,47 @@ func evalProp(n node) bool {
 		var t []string
 		t = append(t, a[:i]...)
 		t = append(t, a[i+1:]...)
-		lc, d1, d2 := decompose(s, "l", t, c)
-		if lc != "" {
-			fmt.Printf("Proposotional Formula: %s %s %s\n", lc, d1, d2)
+		conn, d1, d2 := decompose(s, "l", t, c)
+		if conn != "" {
+			n.conn = conn
+			fmt.Printf("Proposotional Formula: %s %s %s\n", conn, d1, d2)
+			if d1 != nil {
+				child := node{n, d1[0], d1[1], "", nil, false}
+				n.child = append(n.child, &child)
+			}
+			if d2 != nil {
+				child := node{n, d2[0], d2[1], "", nil, false}
+				n.child = append(n.child, &child)
+			}
+			return true
 		}
 	}
+
+	for i, s := range c {
+		var t []string
+		t = append(t, c[:i]...)
+		t = append(t, c[i+1:]...)
+		conn, d1, d2 := decompose(s, "r", a, t)
+		if conn != "" {
+			n.conn = conn
+			fmt.Printf("Proposotional Formula: %s %s %s\n", conn, d1, d2)
+			if d1 != nil {
+				child := node{n, d1[0], d1[1], "", nil, false}
+				n.child = append(n.child, &child)
+			}
+			if d2 != nil {
+				child := node{n, d2[0], d2[1], "", nil, false}
+				n.child = append(n.child, &child)
+			}
+			return true
+		}
+	}
+
 	return false
 }
 
 func parse(r *node, n *node) int {
-	e := evalProp(*r)
+	e := evalProp(r)
 	if e == true {
 		r.valid = true
 	}
@@ -134,7 +188,7 @@ func prove() int {
 
 	st := time.Now()
 
-	root := node{nil, antecedents, consequents, nil, false}
+	root := node{nil, antecedents, consequents, "", nil, false}
 	fmt.Println("Root: ", root)
 
 	parse(&root, &root)
