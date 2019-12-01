@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -24,9 +22,13 @@ func isValid(a []string, c []string) bool {
 	m := make(map[string]bool)
 	var s []string
 	var u []string
+	re := regexp.MustCompile(`^[A-Z]$`)
 
 	s = append(a)
 	for _, e := range s {
+		if re.FindStringSubmatch(e) == nil {
+			return false
+		}
 		if !m[e] {
 			m[e] = true
 			u = append(u, e)
@@ -35,6 +37,9 @@ func isValid(a []string, c []string) bool {
 
 	for _, i := range u {
 		for _, j := range c {
+			if re.FindStringSubmatch(j) == nil {
+				return false
+			}
 			if i == j {
 				return true
 			}
@@ -101,6 +106,7 @@ func evalProp(n *node) bool {
 	a := n.antecedents
 	c := n.consequents
 	if isValid(a, c) {
+		n.valid = true
 		return true
 	}
 
@@ -111,7 +117,6 @@ func evalProp(n *node) bool {
 		conn, d1, d2 := decompose(s, "l", t, c)
 		if conn != "" {
 			n.conn = conn
-			fmt.Printf("Proposotional Formula: %s %s %s\n", conn, d1, d2)
 			if d1 != nil {
 				child := node{n, d1[0], d1[1], "", nil, false}
 				n.child = append(n.child, &child)
@@ -131,7 +136,6 @@ func evalProp(n *node) bool {
 		conn, d1, d2 := decompose(s, "r", a, t)
 		if conn != "" {
 			n.conn = conn
-			fmt.Printf("Proposotional Formula: %s %s %s\n", conn, d1, d2)
 			child := node{n, d1[0], d1[1], "", nil, false}
 			n.child = append(n.child, &child)
 			if d2 != nil {
@@ -146,47 +150,47 @@ func evalProp(n *node) bool {
 }
 
 func parse(r *node, n *node) int {
-	e := evalProp(r)
-	if e == true {
-		r.valid = true
+	e := evalProp(n)
+	if !e {
+		r.valid = false
 	}
-	/*
-		for _, c := range n.child {
-			parse(r, &c)
-		}
-	*/
+
+	for _, c := range n.child {
+		parse(r, c)
+	}
 
 	return 0
 }
 
 func prove() int {
 
-	fmt.Print("Sequent? ")
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
+	/*
+		fmt.Print("Sequent? ")
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
-	as := strings.Split(s[0], ",")
-	var antecedents []string
-	for _, a := range as {
-		antecedents = append(antecedents, a)
-	}
-	fmt.Println("Antecedents: ", antecedents)
+		as := strings.Split(s[0], ",")
+		var antecedents []string
+		for _, a := range as {
+			antecedents = append(antecedents, a)
+		}
+		fmt.Println("Antecedents: ", antecedents)
 
-	cs := strings.Split(s[1], ",")
-	var consequents []string
-	for _, c := range cs {
-		consequents = append(consequents, c)
-	}
-	fmt.Println("Consequents: ", consequents)
-
+		cs := strings.Split(s[1], ",")
+		var consequents []string
+		for _, c := range cs {
+			consequents = append(consequents, c)
+		}
+		fmt.Println("Consequents: ", consequents)
+	*/
 	// Debug
-	// antecedents := []string{"A", "A->B", "A"}
-	// consequents := []string{"A"}
+	antecedents := []string{"A"}
+	consequents := []string{"B", "A->B"}
 
 	st := time.Now()
 
-	root := node{nil, antecedents, consequents, "", nil, false}
+	root := node{nil, antecedents, consequents, "", nil, true}
 	fmt.Println("Root: ", root)
 
 	parse(&root, &root)
