@@ -51,7 +51,7 @@ func isValid(a []string, c []string) bool {
 func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string) {
 	// ToDo: Nagation case
 
-	re := regexp.MustCompile(`^\s*(~?[A-Z!])\s*(->|\|{2}|&&)\s*(~?[A-Z!])\s*$`)
+	re := regexp.MustCompile(`^(~?[A-Z!])\s*(->|\|{2}|&&)\s*(~?[A-Z!])$`)
 	pf := re.FindStringSubmatch(l)
 	if pf == nil {
 		return "", nil, nil
