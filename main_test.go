@@ -8,9 +8,9 @@ import (
 func walk(n node) {
 	if n.parent == nil {
 		fmt.Println("[Root of sequent]")
-		fmt.Printf("%v |- %v\n", n.antecedents, n.consequents)
+		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
 	} else {
-		fmt.Printf("%v |- %v (Parent) %v |- %v\n", n.antecedents, n.consequents, n.parent.antecedents, n.parent.consequents)
+		fmt.Printf("%v |- %v (Parent) %v |- %v\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
 	}
 
 	if n.child == nil {
@@ -24,14 +24,14 @@ func walk(n node) {
 }
 func TestParse(t *testing.T) {
 
-	var antecedents []string
-	var consequents []string
+	var assumptions []string
+	var conclutions []string
 	var root node
 
 	// Valid
-	antecedents = []string{"A", "B"}
-	consequents = []string{"A"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "B"}
+	conclutions = []string{"A"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -43,9 +43,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// ->L
-	antecedents = []string{"A", "A->B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "A->B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -57,9 +57,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// ->R
-	antecedents = []string{"A", "B"}
-	consequents = []string{"B", "A->B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "B"}
+	conclutions = []string{"B", "A->B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -71,9 +71,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// &&L
-	antecedents = []string{"A", "A&&B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "A&&B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -85,9 +85,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// &&R
-	antecedents = []string{"A"}
-	consequents = []string{"B", "A&&B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A"}
+	conclutions = []string{"B", "A&&B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -99,9 +99,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// ||L
-	antecedents = []string{"A", "A||B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "A||B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -113,9 +113,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// ||R
-	antecedents = []string{"A"}
-	consequents = []string{"B", "A||B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A"}
+	conclutions = []string{"B", "A||B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	parse(&root, &root)
 
@@ -130,14 +130,14 @@ func TestParse(t *testing.T) {
 
 func TestEvalProp(t *testing.T) {
 
-	var antecedents []string
-	var consequents []string
+	var assumptions []string
+	var conclutions []string
 	var root node
 
 	// ->L
-	antecedents = []string{"A", "A->B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "A->B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (->L): The root is %v", root)
@@ -146,9 +146,9 @@ func TestEvalProp(t *testing.T) {
 	}
 
 	// ->R
-	antecedents = []string{"A"}
-	consequents = []string{"B", "A->B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A"}
+	conclutions = []string{"B", "A->B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (->R): The root is %v", root)
@@ -157,9 +157,9 @@ func TestEvalProp(t *testing.T) {
 	}
 
 	// &&L
-	antecedents = []string{"A", "A&&B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A", "A&&B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (&&L): The root is %v", root)
@@ -168,9 +168,9 @@ func TestEvalProp(t *testing.T) {
 	}
 
 	// &&R
-	antecedents = []string{"A"}
-	consequents = []string{"B", "A&&B"}
-	root = node{nil, antecedents, consequents, "", nil, true}
+	assumptions = []string{"A"}
+	conclutions = []string{"B", "A&&B"}
+	root = node{nil, assumptions, conclutions, "", nil, true}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (&&R): The root is %v", root)
@@ -179,9 +179,9 @@ func TestEvalProp(t *testing.T) {
 	}
 
 	// ||L
-	antecedents = []string{"A", "A||B"}
-	consequents = []string{"B"}
-	root = node{nil, antecedents, consequents, "", nil, false}
+	assumptions = []string{"A", "A||B"}
+	conclutions = []string{"B"}
+	root = node{nil, assumptions, conclutions, "", nil, false}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (||L): The root is %v", root)
@@ -190,9 +190,9 @@ func TestEvalProp(t *testing.T) {
 	}
 
 	// ||R
-	antecedents = []string{"A"}
-	consequents = []string{"B", "A||B"}
-	root = node{nil, antecedents, consequents, "", nil, false}
+	assumptions = []string{"A"}
+	conclutions = []string{"B", "A||B"}
+	root = node{nil, assumptions, conclutions, "", nil, false}
 
 	if !evalProp(&root) {
 		t.Errorf("Failed (||R): The root is %v", root)
