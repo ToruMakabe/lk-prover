@@ -11,8 +11,8 @@ const inputFormatMsg = "Please input n^2 * n^2 numbers 0 or 1-9 delimitted by co
 
 type node struct {
 	parent      *node
-	antecedents []string
-	consequents []string
+	assumptions []string
+	conclutions []string
 	conn        string
 	child       []*node
 	valid       bool
@@ -103,8 +103,8 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 }
 
 func evalProp(n *node) bool {
-	a := n.antecedents
-	c := n.consequents
+	a := n.assumptions
+	c := n.conclutions
 	if isValid(a, c) {
 		n.valid = true
 		return true
@@ -171,26 +171,26 @@ func prove() int {
 		s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
 		as := strings.Split(s[0], ",")
-		var antecedents []string
+		var assumptions []string
 		for _, a := range as {
-			antecedents = append(antecedents, a)
+			assumptions = append(assumptions, a)
 		}
-		fmt.Println("Antecedents: ", antecedents)
+		fmt.Println("assumptions: ", assumptions)
 
 		cs := strings.Split(s[1], ",")
-		var consequents []string
+		var conclutions []string
 		for _, c := range cs {
-			consequents = append(consequents, c)
+			conclutions = append(conclutions, c)
 		}
-		fmt.Println("Consequents: ", consequents)
+		fmt.Println("conclutions: ", conclutions)
 	*/
 	// Debug
-	antecedents := []string{"A"}
-	consequents := []string{"B", "A->B"}
+	assumptions := []string{"A"}
+	conclutions := []string{"B", "A->B"}
 
 	st := time.Now()
 
-	root := node{nil, antecedents, consequents, "", nil, true}
+	root := node{nil, assumptions, conclutions, "", nil, true}
 	fmt.Println("Root: ", root)
 
 	parse(&root, &root)
