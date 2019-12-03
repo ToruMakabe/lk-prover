@@ -22,3 +22,6 @@
 *.code-workspace
 
 lk-prover
+
+parser/parser.go
+parser/y.output

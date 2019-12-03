@@ -66,7 +66,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 
 	switch conn {
 	case "->":
-		if p == "l" {
+		if p == "a" {
 			rv1 = append(rv1, a)
 			rv1 = append(rv1, append(c, v1))
 			rv2 = append(rv2, append(a, v2))
@@ -77,7 +77,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 		rv1 = append(rv1, append(c, v2))
 		return "->R", rv1, nil
 	case "&&":
-		if p == "l" {
+		if p == "a" {
 			rv1 = append(rv1, append(a, v1, v2))
 			rv1 = append(rv1, c)
 			return "&&L", rv1, nil
@@ -88,7 +88,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 		rv2 = append(rv2, []string{v2})
 		return "&&R", rv1, rv2
 	case "||":
-		if p == "l" {
+		if p == "a" {
 			rv1 = append(rv1, a)
 			rv1 = append(rv1, []string{v1})
 			rv2 = append(rv2, c)
@@ -114,7 +114,7 @@ func evalProp(n *node) bool {
 		var t []string
 		t = append(t, a[:i]...)
 		t = append(t, a[i+1:]...)
-		conn, d1, d2 := decompose(s, "l", t, c)
+		conn, d1, d2 := decompose(s, "a", t, c)
 		if conn != "" {
 			n.conn = conn
 			if d1 != nil {
@@ -133,7 +133,7 @@ func evalProp(n *node) bool {
 		var t []string
 		t = append(t, c[:i]...)
 		t = append(t, c[i+1:]...)
-		conn, d1, d2 := decompose(s, "r", a, t)
+		conn, d1, d2 := decompose(s, "c", a, t)
 		if conn != "" {
 			n.conn = conn
 			child := node{n, d1[0], d1[1], "", nil, false}
