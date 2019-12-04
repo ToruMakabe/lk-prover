@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
+
+	"github.com/ToruMakabe/lk-prover/pfparser"
 )
 
 const inputFormatMsg = "Please input n^2 * n^2 numbers 0 or 1-9 delimitted by conma. 0 is empty as Sudoku cell."
@@ -13,7 +16,6 @@ type node struct {
 	parent      *node
 	assumptions []string
 	conclutions []string
-	conn        string
 	child       []*node
 	valid       bool
 }
@@ -49,55 +51,68 @@ func isValid(a []string, c []string) bool {
 }
 
 func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string) {
-	// ToDo: Nagation case
+	pf := pfparser.PfParse(l)
 
-	re := regexp.MustCompile(`^(~?[A-Z!])(->|\|{2}|&&)(~?[A-Z!])$`)
-	pf := re.FindStringSubmatch(l)
-	if pf == nil {
-		return "", nil, nil
-	}
-
-	conn := pf[2]
-	v1 := pf[1]
-	v2 := pf[3]
+	conn := pf[1]
+	v1 := pf[0]
+	v2 := pf[2]
 
 	var rv1 [][]string
 	var rv2 [][]string
 
+	if pf == nil {
+		return "", nil, nil
+	}
+
+	if conn == "" {
+		if strings.HasPrefix(v1, "~") {
+			if p == "a" {
+				rv1 = append(rv1, a)
+				rv1 = append(rv1, append(c, strings.TrimLeft(v1, "~")))
+				return "~L", rv1, rv2
+			}
+			rv1 = append(rv1, append(a, strings.TrimLeft(v1, "~")))
+			rv1 = append(rv1, c)
+			return "~R", rv1, rv2
+		}
+		rv1 = append(rv1, []string{v1})
+		return "", rv1, nil
+	}
+
 	switch conn {
-	case "->":
+	case ">":
 		if p == "a" {
 			rv1 = append(rv1, a)
 			rv1 = append(rv1, append(c, v1))
 			rv2 = append(rv2, append(a, v2))
 			rv2 = append(rv2, c)
-			return "->L", rv1, rv2
+			return ">L", rv1, rv2
 		}
 		rv1 = append(rv1, append(a, v1))
 		rv1 = append(rv1, append(c, v2))
-		return "->R", rv1, nil
-	case "&&":
+		return ">R", rv1, nil
+	case "&":
 		if p == "a" {
 			rv1 = append(rv1, append(a, v1, v2))
 			rv1 = append(rv1, c)
-			return "&&L", rv1, nil
+			return "&L", rv1, nil
 		}
 		rv1 = append(rv1, a)
 		rv1 = append(rv1, []string{v1})
 		rv2 = append(rv2, c)
 		rv2 = append(rv2, []string{v2})
-		return "&&R", rv1, rv2
-	case "||":
+		return "&R", rv1, rv2
+	case "|":
 		if p == "a" {
 			rv1 = append(rv1, a)
 			rv1 = append(rv1, []string{v1})
 			rv2 = append(rv2, c)
 			rv2 = append(rv2, []string{v2})
-			return "||L", rv1, rv2
+			return "|L", rv1, rv2
 		}
 		rv1 = append(rv1, a)
 		rv1 = append(rv1, append(c, v1, v2))
-		return "||R", rv1, nil
+		return "|R", rv1, nil
 	}
 	return "", nil, nil
 }
@@ -116,13 +131,11 @@ func evalProp(n *node) bool {
 		t = append(t, a[i+1:]...)
 		conn, d1, d2 := decompose(s, "a", t, c)
 		if conn != "" {
-			n.conn = conn
-			if d1 != nil {
-				child := node{n, d1[0], d1[1], "", nil, false}
-				n.child = append(n.child, &child)
-			}
+			//			n.conn = conn
+			child := node{n, d1[0], d1[1], nil, false}
+			n.child = append(n.child, &child)
 			if d2 != nil {
-				child := node{n, d2[0], d2[1], "", nil, false}
+				child := node{n, d2[0], d2[1], nil, false}
 				n.child = append(n.child, &child)
 			}
 			return true
@@ -135,11 +148,11 @@ func evalProp(n *node) bool {
 		t = append(t, c[i+1:]...)
 		conn, d1, d2 := decompose(s, "c", a, t)
 		if conn != "" {
-			n.conn = conn
-			child := node{n, d1[0], d1[1], "", nil, false}
+			//			n.conn = conn
+			child := node{n, d1[0], d1[1], nil, false}
 			n.child = append(n.child, &child)
 			if d2 != nil {
-				child := node{n, d2[0], d2[1], "", nil, false}
+				child := node{n, d2[0], d2[1], nil, false}
 				n.child = append(n.child, &child)
 			}
 			return true
@@ -149,14 +162,14 @@ func evalProp(n *node) bool {
 	return false
 }
 
-func parse(r *node, n *node) int {
+func parseSeq(r *node, n *node) int {
 	e := evalProp(n)
 	if !e {
 		r.valid = false
 	}
 
 	for _, c := range n.child {
-		parse(r, c)
+		parseSeq(r, c)
 	}
 
 	return 0
@@ -185,15 +198,15 @@ func prove() int {
 		fmt.Println("conclutions: ", conclutions)
 	*/
 	// Debug
-	assumptions := []string{"A"}
-	conclutions := []string{"B", "A->B"}
+	assumptions := []string{"~A", "A"}
+	conclutions := []string{"B"}
 
 	st := time.Now()
 
-	root := node{nil, assumptions, conclutions, "", nil, true}
+	root := node{nil, assumptions, conclutions, nil, true}
 	fmt.Println("Root: ", root)
 
-	parse(&root, &root)
+	parseSeq(&root, &root)
 	fmt.Println("Valid: ", root.valid)
 	fmt.Println("Decomposition Tree: ", root)
 

@@ -1,8 +1,7 @@
 %{
-package parser
+package pfparser
 
 import (
-	"fmt"
 	"io"
 	"strings"
 	"text/scanner"
@@ -137,8 +136,8 @@ func Eval(e Expression) string {
 	}
 }
 
-func main() {
-	r := strings.NewReader("A")
+func PfParse(pf string) []string {
+	r := strings.NewReader(pf)
 	p := Parse(r)
 
 	switch p.(type){
@@ -146,21 +145,13 @@ func main() {
 		a := Eval(p.(BinOpExpr).Left)
 		l := string(rune(p.(BinOpExpr).Operator))
 		c := Eval(p.(BinOpExpr).Right)
-
-		fmt.Printf("%#v\n", a)
-		fmt.Printf("%#v\n", l)
-		fmt.Printf("%#v\n", c)
+		return []string{a,l,c}
 	case NotOpExpr:
 		a := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
-
-		fmt.Printf("%#v\n", a)
-		fmt.Printf("%#v\n", nil)
-		fmt.Printf("%#v\n", nil)
+		return []string{a,"",""}
 	case Literal:
 		a := p.(Literal).Literal
-
-		fmt.Printf("%#v\n", a)
-		fmt.Printf("%#v\n", nil)
-		fmt.Printf("%#v\n", nil)
+		return []string{a,"",""}
 	}
+	return nil
 }
