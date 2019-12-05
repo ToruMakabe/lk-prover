@@ -94,9 +94,9 @@ func Eval(e Expression) string {
 	case BinOpExpr:
 		left := Eval(e.(BinOpExpr).Left)
 		right := Eval(e.(BinOpExpr).Right)
-		return left + string(rune(e.(BinOpExpr).Operator)) + right
+		return "(" + left + string(rune(e.(BinOpExpr).Operator)) + right + ")"
 	case NotOpExpr:
-		return string(rune(e.(NotOpExpr).Operator)) + Eval(e.(NotOpExpr).Right)
+		return "(" + string(rune(e.(NotOpExpr).Operator)) + Eval(e.(NotOpExpr).Right) + ")"
 	case Literal:
 		return e.(Literal).Literal
 	default:

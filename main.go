@@ -11,7 +11,7 @@ import (
 	"github.com/ToruMakabe/lk-prover/pfparser"
 )
 
-const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions). Nagation:~, And:&, Or:|, Implication:>. You can specify multi assumtions/conclutions delimitted by comma. Sample: A&B,C |- A,B"
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
 
 type node struct {
 	parent      *node
@@ -57,15 +57,19 @@ func isValid(a []string, c []string) bool {
 		}
 	}
 
+	v := false
 	for _, i := range u {
 		for _, j := range c {
 			if re.FindStringSubmatch(j) == nil {
 				return false
 			}
 			if i == j {
-				return true
+				v = true
 			}
 		}
+	}
+	if v == true {
+		return true
 	}
 	return false
 }
@@ -120,16 +124,16 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 			return "&L", rv1, nil
 		}
 		rv1 = append(rv1, a)
-		rv1 = append(rv1, []string{v1})
-		rv2 = append(rv2, c)
-		rv2 = append(rv2, []string{v2})
+		rv1 = append(rv1, append(c, v1))
+		rv2 = append(rv2, a)
+		rv2 = append(rv2, append(c, v2))
 		return "&R", rv1, rv2
 	case "|":
 		if p == "a" {
-			rv1 = append(rv1, a)
-			rv1 = append(rv1, []string{v1})
+			rv1 = append(rv1, append(a, v1))
+			rv1 = append(rv1, c)
+			rv2 = append(rv2, append(c, v1))
 			rv2 = append(rv2, c)
-			rv2 = append(rv2, []string{v2})
 			return "|L", rv1, rv2
 		}
 		rv1 = append(rv1, a)
@@ -204,23 +208,32 @@ func prove() int {
 	scanner.Scan()
 	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
+	if len(s) != 2 {
+		fmt.Println(inputFormatMsg)
+		return 1
+	}
+
 	as := strings.Split(s[0], ",")
 	var assumptions []string
-	for _, a := range as {
-		assumptions = append(assumptions, a)
+	if as[0] != "" {
+		for _, a := range as {
+			assumptions = append(assumptions, a)
+		}
 	}
 	fmt.Println("assumptions: ", assumptions)
 
 	cs := strings.Split(s[1], ",")
 	var conclutions []string
-	for _, c := range cs {
-		conclutions = append(conclutions, c)
+	if cs[0] != "" {
+		for _, c := range cs {
+			conclutions = append(conclutions, c)
+		}
 	}
 	fmt.Println("conclutions: ", conclutions)
 
 	/* for debug
-	assumptions := []string{"~A", "A"}
-	conclutions := []string{"B"}
+	assumptions := []string{}
+	conclutions := []string{"A>(B>A)"}
 	*/
 
 	st := time.Now()
@@ -229,15 +242,14 @@ func prove() int {
 
 	parseSeq(&root, &root)
 	if root.valid == true {
-		fmt.Println("Provable.", root.valid)
+		fmt.Println("Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
 	} else {
-		fmt.Println("Unprovable.", root.valid)
+		fmt.Println("Unprovable")
 	}
-
-	fmt.Println("[Root of sequent]")
-	walk(root)
-	fmt.Println("[End of tree]")
-	fmt.Println()
 
 	// 処理時間を表示する.
 	et := time.Now()

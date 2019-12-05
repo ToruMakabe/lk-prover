@@ -19,12 +19,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (Valid): The root is %v", root)
+		t.Errorf("(Already valid test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (Valid): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(Already valid test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -36,12 +36,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (~L): The root is %v", root)
+		t.Errorf("(~L test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (~L): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(~L test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -53,12 +53,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (~R): The root is %v", root)
+		t.Errorf("(~R test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (~R): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(~R test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -70,12 +70,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (>L): The root is %v", root)
+		t.Errorf("(>L test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (>L): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(>L test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -87,12 +87,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (>R): The root is %v", root)
+		t.Errorf("(>R test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (>R): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(>R test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -104,46 +104,46 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (&L): The root is %v", root)
+		t.Errorf("(&L test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (&L): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(&L test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
 	// &R
 	assumptions = []string{"A"}
-	conclutions = []string{"B", "A&B"}
+	conclutions = []string{"A", "A&B"}
 	root = node{nil, assumptions, conclutions, nil, true}
 
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (&R): The root is %v", root)
+		t.Errorf("(&R test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (&R): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(&R test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
 	// |L
 	assumptions = []string{"A", "A|B"}
-	conclutions = []string{"B"}
+	conclutions = []string{"A"}
 	root = node{nil, assumptions, conclutions, nil, true}
 
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (|L): The root is %v", root)
+		t.Errorf("(|L test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (|L): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(|L test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -155,12 +155,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (|R): The root is %v", root)
+		t.Errorf("(|R test): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (|R): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(|R test): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -172,12 +172,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (Complex #1): The root is %v", root)
+		t.Errorf("(Complex test #1): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (Complex #1): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(Complex test #1): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -189,12 +189,12 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (Complex #2): The root is %v", root)
+		t.Errorf("(Complex test #2): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (Complex #2): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(Complex test #2): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
@@ -206,12 +206,182 @@ func TestParse(t *testing.T) {
 	parseSeq(&root, &root)
 
 	if !root.valid {
-		t.Errorf("Failed (Complex #3): The root is %v", root)
+		t.Errorf("(Complex test #3): Failed. The root is %v", root)
 	} else {
-		fmt.Println("Info (Complex #3): Provable")
-		fmt.Println("*** Root of sequent ***")
+		fmt.Println("(Complex test #3): Provable")
+		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
-		fmt.Println("*** End of sequent ***")
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #1.1
+	assumptions = []string{}
+	conclutions = []string{"A>(B>A)"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #1.1): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #1.1): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #1.2
+	assumptions = []string{}
+	conclutions = []string{"(A>(B>C))>((A>B)>(A>C))"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #1.2): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #1.2): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #2.1
+	assumptions = []string{}
+	conclutions = []string{"A>(A|B)"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #2.1): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #2.1): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #2.2
+	assumptions = []string{}
+	conclutions = []string{"B>(A|B)"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #2.2): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #2.2): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #2.3
+	assumptions = []string{}
+	conclutions = []string{"(A>C)>((B>C)>((A|B)>C))"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #2.3): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #2.3): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #3.1
+	assumptions = []string{}
+	conclutions = []string{"(A&B)>A"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #3.1): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #3.1): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #3.2
+	assumptions = []string{}
+	conclutions = []string{"(A&B)>B"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #3.2): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #3.2): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #4.1
+	assumptions = []string{}
+	conclutions = []string{"(A>B)>((A>~B)>~A)"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #4.1): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #4.1): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #4.2
+	assumptions = []string{}
+	conclutions = []string{"A>(~A>B)"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #4.2): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #4.2): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
+	}
+
+	// Hilbert-style deduction system axiom #4.3
+	assumptions = []string{}
+	conclutions = []string{"A|~A"}
+	root = node{nil, assumptions, conclutions, nil, true}
+
+	parseSeq(&root, &root)
+
+	if !root.valid {
+		t.Errorf("(Hilbert axiom test #4.3): Failed. The root is %v", root)
+	} else {
+		fmt.Println("(Hilbert axiom test #4.3): Provable")
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	}
 
