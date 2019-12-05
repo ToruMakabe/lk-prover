@@ -5,23 +5,6 @@ import (
 	"testing"
 )
 
-func walk(n node) {
-	if n.parent == nil {
-		fmt.Println("[Root of sequent]")
-		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
-	} else {
-		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
-	}
-
-	if n.child == nil {
-		fmt.Println("[End of branch]")
-		fmt.Println()
-	}
-
-	for _, c := range n.child {
-		walk(*c)
-	}
-}
 func TestParse(t *testing.T) {
 
 	var assumptions []string
@@ -38,8 +21,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (Valid): The root is %v", root)
 	} else {
+		fmt.Println("Info (Valid): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (Valid): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// ~L
@@ -52,8 +38,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (~L): The root is %v", root)
 	} else {
+		fmt.Println("Info (~L): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (~L): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// ~R
@@ -66,8 +55,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (~R): The root is %v", root)
 	} else {
+		fmt.Println("Info (~R): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (~R): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// >L
@@ -80,8 +72,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (>L): The root is %v", root)
 	} else {
+		fmt.Println("Info (>L): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (>L): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// >R
@@ -94,8 +89,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (>R): The root is %v", root)
 	} else {
+		fmt.Println("Info (>R): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (>R): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// &L
@@ -108,8 +106,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (&L): The root is %v", root)
 	} else {
+		fmt.Println("Info (&L): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (&L): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// &R
@@ -122,8 +123,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (&R): The root is %v", root)
 	} else {
+		fmt.Println("Info (&R): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (&R): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// |L
@@ -136,8 +140,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (|L): The root is %v", root)
 	} else {
+		fmt.Println("Info (|L): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (|L): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// |R
@@ -150,8 +157,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (|R): The root is %v", root)
 	} else {
+		fmt.Println("Info (|R): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (|R): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// Complex #1
@@ -164,8 +174,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (Complex #1): The root is %v", root)
 	} else {
+		fmt.Println("Info (Complex #1): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (Complex #1): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// Complex #2
@@ -178,8 +191,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (Complex #2): The root is %v", root)
 	} else {
+		fmt.Println("Info (Complex #2): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (Complex #2): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 	// Complex #3
@@ -192,8 +208,11 @@ func TestParse(t *testing.T) {
 	if !root.valid {
 		t.Errorf("Failed (Complex #3): The root is %v", root)
 	} else {
+		fmt.Println("Info (Complex #3): Provable")
+		fmt.Println("*** Root of sequent ***")
 		walk(root)
-		t.Logf("Info (Complex #3): The root is %v", root)
+		fmt.Println("*** End of sequent ***")
+		fmt.Println()
 	}
 
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"regexp"
@@ -10,7 +11,7 @@ import (
 	"github.com/ToruMakabe/lk-prover/pfparser"
 )
 
-const inputFormatMsg = "Please input n^2 * n^2 numbers 0 or 1-9 delimitted by conma. 0 is empty as Sudoku cell."
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions). Nagation:~, And:&, Or:|, Implication:>. You can specify multi assumtions/conclutions delimitted by comma. Sample: A&B,C |- A,B"
 
 type node struct {
 	parent      *node
@@ -20,10 +21,29 @@ type node struct {
 	valid       bool
 }
 
+func walk(n node) {
+	if n.parent == nil {
+		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
+	} else {
+		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
+	}
+
+	if n.child == nil {
+		fmt.Println("** End of branch **")
+	}
+
+	for _, c := range n.child {
+		walk(*c)
+	}
+}
+
 func isValid(a []string, c []string) bool {
 	m := make(map[string]bool)
-	var s []string
-	var u []string
+	var (
+		s []string
+		u []string
+	)
+
 	re := regexp.MustCompile(`^[A-Z]$`)
 
 	s = append(a)
@@ -57,8 +77,10 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 	v1 := pf[0]
 	v2 := pf[2]
 
-	var rv1 [][]string
-	var rv2 [][]string
+	var (
+		rv1 [][]string
+		rv2 [][]string
+	)
 
 	if pf == nil {
 		return "", nil, nil
@@ -117,7 +139,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 	return "", nil, nil
 }
 
-func evalProp(n *node) bool {
+func evalPf(n *node) bool {
 	a := n.assumptions
 	c := n.conclutions
 	if isValid(a, c) {
@@ -148,7 +170,6 @@ func evalProp(n *node) bool {
 		t = append(t, c[i+1:]...)
 		conn, d1, d2 := decompose(s, "c", a, t)
 		if conn != "" {
-			//			n.conn = conn
 			child := node{n, d1[0], d1[1], nil, false}
 			n.child = append(n.child, &child)
 			if d2 != nil {
@@ -163,7 +184,7 @@ func evalProp(n *node) bool {
 }
 
 func parseSeq(r *node, n *node) int {
-	e := evalProp(n)
+	e := evalPf(n)
 	if !e {
 		r.valid = false
 	}
@@ -177,38 +198,46 @@ func parseSeq(r *node, n *node) int {
 
 func prove() int {
 
-	/*
-		fmt.Print("Sequent? ")
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
+	fmt.Println(inputFormatMsg)
+	fmt.Print("Sequent? ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
-		as := strings.Split(s[0], ",")
-		var assumptions []string
-		for _, a := range as {
-			assumptions = append(assumptions, a)
-		}
-		fmt.Println("assumptions: ", assumptions)
+	as := strings.Split(s[0], ",")
+	var assumptions []string
+	for _, a := range as {
+		assumptions = append(assumptions, a)
+	}
+	fmt.Println("assumptions: ", assumptions)
 
-		cs := strings.Split(s[1], ",")
-		var conclutions []string
-		for _, c := range cs {
-			conclutions = append(conclutions, c)
-		}
-		fmt.Println("conclutions: ", conclutions)
-	*/
-	// Debug
+	cs := strings.Split(s[1], ",")
+	var conclutions []string
+	for _, c := range cs {
+		conclutions = append(conclutions, c)
+	}
+	fmt.Println("conclutions: ", conclutions)
+
+	/* for debug
 	assumptions := []string{"~A", "A"}
 	conclutions := []string{"B"}
+	*/
 
 	st := time.Now()
 
 	root := node{nil, assumptions, conclutions, nil, true}
-	fmt.Println("Root: ", root)
 
 	parseSeq(&root, &root)
-	fmt.Println("Valid: ", root.valid)
-	fmt.Println("Decomposition Tree: ", root)
+	if root.valid == true {
+		fmt.Println("Provable.", root.valid)
+	} else {
+		fmt.Println("Unprovable.", root.valid)
+	}
+
+	fmt.Println("[Root of sequent]")
+	walk(root)
+	fmt.Println("[End of tree]")
+	fmt.Println()
 
 	// 処理時間を表示する.
 	et := time.Now()
