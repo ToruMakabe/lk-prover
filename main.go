@@ -187,7 +187,7 @@ func evalPf(n *node) bool {
 	return false
 }
 
-func parseSeq(r *node, n *node) int {
+func parseSeq(r *node, n *node) {
 	e := evalPf(n)
 	if !e {
 		r.valid = false
@@ -196,8 +196,6 @@ func parseSeq(r *node, n *node) int {
 	for _, c := range n.child {
 		parseSeq(r, c)
 	}
-
-	return 0
 }
 
 func prove() int {
