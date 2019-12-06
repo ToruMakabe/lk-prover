@@ -8,7 +8,9 @@ import __yyfmt__ "fmt"
 //line pfparser.go.y:3
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"strings"
 	"text/scanner"
 )
@@ -35,7 +37,7 @@ type BinOpExpr struct {
 	Right    Expression
 }
 
-//line pfparser.go.y:36
+//line pfparser.go.y:37
 type yySymType struct {
 	yys   int
 	token Token
@@ -62,9 +64,11 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line pfparser.go.y:99
+//line pfparser.go.y:100
 
-// 以降はGoで記述する.
+// 以降はgoyaccのユーザー定義部. Goで記述する.
+
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
 
 // 字句解析器(Lexer)とyaccを用いた構文解析処理(ここから)
 type Lexer struct {
@@ -82,7 +86,12 @@ func (l *Lexer) Lex(lval *yySymType) int {
 }
 
 func (l *Lexer) Error(e string) {
-	panic(e)
+	fmt.Println()
+	fmt.Println("Syntax error!!")
+	fmt.Println()
+	fmt.Println(inputFormatMsg)
+	os.Exit(1)
+	//	panic(e)
 }
 
 func Parse(r io.Reader) Expression {
@@ -110,7 +119,7 @@ func Eval(e Expression) string {
 	}
 }
 
-// PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
+// PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
 func PfParse(pf string) []string {
 	r := strings.NewReader(pf)
 	// yaccで構文木を作成する.
@@ -118,16 +127,16 @@ func PfParse(pf string) []string {
 
 	switch p.(type) {
 	case BinOpExpr:
-		a := Eval(p.(BinOpExpr).Left)
-		l := string(rune(p.(BinOpExpr).Operator))
-		c := Eval(p.(BinOpExpr).Right)
-		return []string{a, l, c}
+		v1 := Eval(p.(BinOpExpr).Left)
+		lc := string(rune(p.(BinOpExpr).Operator))
+		v2 := Eval(p.(BinOpExpr).Right)
+		return []string{v1, lc, v2}
 	case NotOpExpr:
-		a := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
-		return []string{a, "", ""}
+		v1 := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
+		return []string{v1, "", ""}
 	case Literal:
-		a := p.(Literal).Literal
-		return []string{a, "", ""}
+		v1 := p.(Literal).Literal
+		return []string{v1, "", ""}
 	}
 	return nil
 }
@@ -541,44 +550,44 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pfparser.go.y:53
+//line pfparser.go.y:54
 		{
 			yyVAL.expr = yyDollar[1].expr
 			yylex.(*Lexer).result = yyVAL.expr
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line pfparser.go.y:60
+//line pfparser.go.y:61
 		{
 			yyVAL.expr = Literal{Literal: yyDollar[1].token.Literal}
 		}
 	case 8:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pfparser.go.y:71
+//line pfparser.go.y:72
 		{
 			yyVAL.expr = BinOpExpr{Left: yyDollar[1].expr, Operator: '&', Right: yyDollar[3].expr}
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pfparser.go.y:77
+//line pfparser.go.y:78
 		{
 			yyVAL.expr = BinOpExpr{Left: yyDollar[1].expr, Operator: '|', Right: yyDollar[3].expr}
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pfparser.go.y:83
+//line pfparser.go.y:84
 		{
 			yyVAL.expr = BinOpExpr{Left: yyDollar[1].expr, Operator: '>', Right: yyDollar[3].expr}
 		}
 	case 11:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line pfparser.go.y:89
+//line pfparser.go.y:90
 		{
 			yyVAL.expr = NotOpExpr{Operator: '~', Right: yyDollar[2].expr}
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line pfparser.go.y:95
+//line pfparser.go.y:96
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}

@@ -234,6 +234,9 @@ func prove() int {
 	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
 	if len(s) != 2 {
+		fmt.Println()
+		fmt.Println("Syntax error!!")
+		fmt.Println()
 		fmt.Println(inputFormatMsg)
 		return 1
 	}
@@ -267,13 +270,17 @@ func prove() int {
 	parseSeq(&root, &root)
 	// 構文解析の結果vaildなシーケントへ分解できたら、その結果を出力する.できなかった場合は "Unprovable" を出力する.
 	if root.valid == true {
+		fmt.Println()
 		fmt.Println("Provable")
+		fmt.Println()
 		fmt.Println("*** Root of sequent tree ***")
 		walk(root)
 		fmt.Println("*** End of sequent tree ***")
 		fmt.Println()
 	} else {
+		fmt.Println()
 		fmt.Println("Unprovable")
+		fmt.Println()
 	}
 
 	// 証明可能かを判定するのに要した時間を表示する.

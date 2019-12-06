@@ -1,9 +1,11 @@
-// yaccとGoの埋め込みブロック.
+// %はgoyaccのヘッダ定義
 %{
 package pfparser
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"strings"
 	"text/scanner"
 )
@@ -32,7 +34,6 @@ type BinOpExpr struct {
 
 %}
 
-// yaccの埋め込みブロック.
 %union{
   token Token
   expr Expression
@@ -45,8 +46,8 @@ type BinOpExpr struct {
 %left '&' '|' '>'
 %right '~'
 
-// yaccの埋め込みブロック.
 %%
+// 以降はgoyaccの規則部.
 
 program
   : expr
@@ -97,8 +98,9 @@ paren_expr
 	}
 
 %%
+// 以降はgoyaccのユーザー定義部. Goで記述する.
 
-// 以降はGoで記述する.
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
 
 // 字句解析器(Lexer)とyaccを用いた構文解析処理(ここから)
 type Lexer struct {
@@ -116,7 +118,12 @@ func (l *Lexer) Lex(lval *yySymType) int {
 }
 
 func (l *Lexer) Error(e string) {
-	panic(e)
+	fmt.Println()
+	fmt.Println("Syntax error!!")
+	fmt.Println()
+	fmt.Println(inputFormatMsg)
+	os.Exit(1)
+//	panic(e)
 }
 
 func Parse(r io.Reader) Expression {
@@ -143,7 +150,7 @@ func Eval(e Expression) string {
 	}
 }
 
-// PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
+// PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
 func PfParse(pf string) []string {
 	r := strings.NewReader(pf)
 	// yaccで構文木を作成する.
@@ -151,16 +158,16 @@ func PfParse(pf string) []string {
 
 	switch p.(type){
 	case BinOpExpr:
-		a := Eval(p.(BinOpExpr).Left)
-		l := string(rune(p.(BinOpExpr).Operator))
-		c := Eval(p.(BinOpExpr).Right)
-		return []string{a,l,c}
+		v1 := Eval(p.(BinOpExpr).Left)
+		lc := string(rune(p.(BinOpExpr).Operator))
+		v2 := Eval(p.(BinOpExpr).Right)
+		return []string{v1,lc,v2}
 	case NotOpExpr:
-		a := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
-		return []string{a,"",""}
+		v1 := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
+		return []string{v1,"",""}
 	case Literal:
-		a := p.(Literal).Literal
-		return []string{a,"",""}
+		v1 := p.(Literal).Literal
+		return []string{v1,"",""}
 	}
 	return nil
 }
