@@ -1,11 +1,10 @@
-// %はgoyaccのヘッダ定義
+// %はgoyaccの定義部
 %{
 package pfparser
 
 import (
-	"fmt"
+	"errors"
 	"io"
-	"os"
 	"strings"
 	"text/scanner"
 )
@@ -100,12 +99,11 @@ paren_expr
 %%
 // 以降はgoyaccのユーザー定義部. Goで記述する.
 
-const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
-
-// 字句解析器(Lexer)とyaccを用いた構文解析処理(ここから)
+// 字句解析器(Lexer)とyaccを用いた構文解析関数(ここから)
 type Lexer struct {
 	scanner.Scanner
 	result Expression
+	err	error
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
@@ -118,21 +116,19 @@ func (l *Lexer) Lex(lval *yySymType) int {
 }
 
 func (l *Lexer) Error(e string) {
-	fmt.Println()
-	fmt.Println("Syntax error!!")
-	fmt.Println()
-	fmt.Println(inputFormatMsg)
-	os.Exit(1)
-//	panic(e)
+	l.err = errors.New(e)
 }
 
-func Parse(r io.Reader) Expression {
+func Parse(r io.Reader) (Expression, error) {
 	l := new(Lexer)
 	l.Init(r)
 	yyParse(l)
-	return l.result
+	if l.err != nil {
+		return nil, l.err
+	}
+	return l.result, nil
 }
-// 字句解析器(Lexer)とyaccを用いた構文解析処理(ここまで)
+// 字句解析器(Lexer)とyaccを用いた構文解析関数(ここまで)
 
 // Evalはyaccで作成した構文木を文字列に変換する.
 func Eval(e Expression) string {
@@ -151,23 +147,26 @@ func Eval(e Expression) string {
 }
 
 // PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
-func PfParse(pf string) []string {
+func PfParse(pf string) ([]string, error) {
 	r := strings.NewReader(pf)
 	// yaccで構文木を作成する.
-	p := Parse(r)
+	p, err := Parse(r)
+	if err != nil {
+		return nil, err
+	}
 
 	switch p.(type){
 	case BinOpExpr:
 		v1 := Eval(p.(BinOpExpr).Left)
 		lc := string(rune(p.(BinOpExpr).Operator))
 		v2 := Eval(p.(BinOpExpr).Right)
-		return []string{v1,lc,v2}
+		return []string{v1,lc,v2}, nil
 	case NotOpExpr:
 		v1 := string(rune(p.(NotOpExpr).Operator)) + Eval(p.(NotOpExpr).Right)
-		return []string{v1,"",""}
+		return []string{v1,"",""}, nil
 	case Literal:
 		v1 := p.(Literal).Literal
-		return []string{v1,"",""}
+		return []string{v1,"",""}, nil
 	}
-	return nil
+	return nil, nil
 }

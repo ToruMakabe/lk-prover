@@ -81,10 +81,13 @@ func isValid(a []string, c []string) bool {
 }
 
 // decomposeは規則に従ってシーケントを分解する.
-func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string) {
+func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string, error) {
 
 	// pfparser.PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため、Goのパッケージは分割).
-	pf := pfparser.PfParse(l)
+	pf, err := pfparser.PfParse(l)
+	if err != nil {
+		return "", nil, nil, err
+	}
 
 	conn := pf[1]
 	v1 := pf[0]
@@ -96,7 +99,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 	)
 
 	if pf == nil {
-		return "", nil, nil
+		return "", nil, nil, nil
 	}
 
 	// シーケントを分解する(否定のみ).
@@ -105,14 +108,14 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 			if p == "a" {
 				rv1 = append(rv1, a)
 				rv1 = append(rv1, append(c, strings.TrimLeft(v1, "~")))
-				return "~L", rv1, rv2
+				return "~L", rv1, rv2, nil
 			}
 			rv1 = append(rv1, append(a, strings.TrimLeft(v1, "~")))
 			rv1 = append(rv1, c)
-			return "~R", rv1, rv2
+			return "~R", rv1, rv2, nil
 		}
 		rv1 = append(rv1, []string{v1})
-		return "", rv1, nil
+		return "", rv1, nil, nil
 	}
 
 	// シーケントを分解する(否定の他).
@@ -123,46 +126,46 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 			rv1 = append(rv1, append(c, v1))
 			rv2 = append(rv2, append(a, v2))
 			rv2 = append(rv2, c)
-			return ">L", rv1, rv2
+			return ">L", rv1, rv2, nil
 		}
 		rv1 = append(rv1, append(a, v1))
 		rv1 = append(rv1, append(c, v2))
-		return ">R", rv1, nil
+		return ">R", rv1, nil, nil
 	case "&":
 		if p == "a" {
 			rv1 = append(rv1, append(a, v1, v2))
 			rv1 = append(rv1, c)
-			return "&L", rv1, nil
+			return "&L", rv1, nil, nil
 		}
 		rv1 = append(rv1, a)
 		rv1 = append(rv1, append(c, v1))
 		rv2 = append(rv2, a)
 		rv2 = append(rv2, append(c, v2))
-		return "&R", rv1, rv2
+		return "&R", rv1, rv2, nil
 	case "|":
 		if p == "a" {
 			rv1 = append(rv1, append(a, v1))
 			rv1 = append(rv1, c)
 			rv2 = append(rv2, append(c, v1))
 			rv2 = append(rv2, c)
-			return "|L", rv1, rv2
+			return "|L", rv1, rv2, nil
 		}
 		rv1 = append(rv1, a)
 		rv1 = append(rv1, append(c, v1, v2))
-		return "|R", rv1, nil
+		return "|R", rv1, nil, nil
 	}
-	return "", nil, nil
+	return "", nil, nil, nil
 }
 
 // evalPfは命題論理式の集合を構文解析する.
-func evalPf(n *node) bool {
+func evalPf(n *node) (bool, error) {
 	a := n.assumptions
 	c := n.conclutions
 
 	// すでに恒真かを判定する.
 	if isValid(a, c) {
 		n.valid = true
-		return true
+		return true, nil
 	}
 
 	// シーケントの前提を構成する命題論理式の集合を解析する.
@@ -171,7 +174,10 @@ func evalPf(n *node) bool {
 		t = append(t, a[:i]...)
 		t = append(t, a[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2 := decompose(s, "a", t, c)
+		conn, d1, d2, err := decompose(s, "a", t, c)
+		if err != nil {
+			return false, err
+		}
 		// 分解できれば子として追加する.
 		if conn != "" {
 			child := node{n, d1[0], d1[1], nil, false}
@@ -181,7 +187,7 @@ func evalPf(n *node) bool {
 				child := node{n, d2[0], d2[1], nil, false}
 				n.child = append(n.child, &child)
 			}
-			return true
+			return true, nil
 		}
 	}
 
@@ -191,7 +197,10 @@ func evalPf(n *node) bool {
 		t = append(t, c[:i]...)
 		t = append(t, c[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2 := decompose(s, "c", a, t)
+		conn, d1, d2, err := decompose(s, "c", a, t)
+		if err != nil {
+			return false, err
+		}
 		// 分解できれば子として追加する.
 		if conn != "" {
 			child := node{n, d1[0], d1[1], nil, false}
@@ -201,16 +210,19 @@ func evalPf(n *node) bool {
 				child := node{n, d2[0], d2[1], nil, false}
 				n.child = append(n.child, &child)
 			}
-			return true
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 // parseSeqはシーケントを構文解析する.
-func parseSeq(r *node, n *node) {
-	e := evalPf(n)
+func parseSeq(r *node, n *node) error {
+	e, err := evalPf(n)
+	if err != nil {
+		return err
+	}
 	// 解析の結果、この時点で分解しきれていない、恒真でないと判定できる場合はルートシーケントノードのvaildフラグを偽にする.
 	if !e {
 		r.valid = false
@@ -220,6 +232,8 @@ func parseSeq(r *node, n *node) {
 	for _, c := range n.child {
 		parseSeq(r, c)
 	}
+
+	return nil
 }
 
 // proveは実質的な主処理である.
@@ -235,7 +249,7 @@ func prove() int {
 
 	if len(s) != 2 {
 		fmt.Println()
-		fmt.Println("Syntax error!!")
+		printError(fmt.Errorf("syntax srror"))
 		fmt.Println()
 		fmt.Println(inputFormatMsg)
 		return 1
@@ -267,7 +281,14 @@ func prove() int {
 	root := node{nil, assumptions, conclutions, nil, true}
 
 	// シーケントの構文解析を行う.
-	parseSeq(&root, &root)
+	err := parseSeq(&root, &root)
+	if err != nil {
+		fmt.Println()
+		printError(err)
+		fmt.Println()
+		fmt.Println(inputFormatMsg)
+		return 1
+	}
 	// 構文解析の結果vaildなシーケントへ分解できたら、その結果を出力する.できなかった場合は "Unprovable" を出力する.
 	if root.valid == true {
 		fmt.Println()
