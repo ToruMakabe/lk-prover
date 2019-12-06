@@ -1,3 +1,4 @@
+// yaccとGoの埋め込みブロック.
 %{
 package pfparser
 
@@ -31,7 +32,7 @@ type BinOpExpr struct {
 
 %}
 
-
+// yaccの埋め込みブロック.
 %union{
   token Token
   expr Expression
@@ -44,6 +45,7 @@ type BinOpExpr struct {
 %left '&' '|' '>'
 %right '~'
 
+// yaccの埋め込みブロック.
 %%
 
 program
@@ -96,6 +98,9 @@ paren_expr
 
 %%
 
+// 以降はGoで記述する.
+
+// 字句解析器(Lexer)とyaccを用いた構文解析処理(ここから)
 type Lexer struct {
 	scanner.Scanner
 	result Expression
@@ -120,7 +125,9 @@ func Parse(r io.Reader) Expression {
 	yyParse(l)
 	return l.result
 }
+// 字句解析器(Lexer)とyaccを用いた構文解析処理(ここまで)
 
+// Evalはyaccで作成した構文木を文字列に変換する.
 func Eval(e Expression) string {
 	switch e.(type) {
 	case BinOpExpr:
@@ -136,8 +143,10 @@ func Eval(e Expression) string {
 	}
 }
 
+// PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
 func PfParse(pf string) []string {
 	r := strings.NewReader(pf)
+	// yaccで構文木を作成する.
 	p := Parse(r)
 
 	switch p.(type){
