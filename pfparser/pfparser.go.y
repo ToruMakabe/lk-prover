@@ -39,7 +39,7 @@ type BinOpExpr struct {
   expr Expression
 }
 
-%type<expr> program
+%type<expr> formula
 %type<expr> expr and_expr or_expr not_expr impl_expr paren_expr
 %token<token> LITERAL
 
@@ -49,7 +49,7 @@ type BinOpExpr struct {
 %%
 // 以降はgoyaccの規則部.
 
-program
+formula
   : expr
   {
     $$ = $1

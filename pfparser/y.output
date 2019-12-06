@@ -1,13 +1,13 @@
 
 state 0
-	$accept: .program $end 
+	$accept: .formula $end 
 
 	LITERAL  shift 3
 	'~'  shift 9
 	'('  shift 10
 	.  error
 
-	program  goto 1
+	formula  goto 1
 	expr  goto 2
 	and_expr  goto 4
 	or_expr  goto 5
@@ -16,14 +16,14 @@ state 0
 	paren_expr  goto 8
 
 state 1
-	$accept:  program.$end 
+	$accept:  formula.$end 
 
 	$end  accept
 	.  error
 
 
 state 2
-	program:  expr.    (1)
+	formula:  expr.    (1)
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
 	impl_expr:  expr.'>' expr 
