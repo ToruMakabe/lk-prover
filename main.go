@@ -209,7 +209,7 @@ func evalPf(n *node) bool {
 }
 
 // parseSeqはシーケントを構文解析する.
-func parseSeq(r *node, n *node) int {
+func parseSeq(r *node, n *node) {
 	e := evalPf(n)
 	// 解析の結果、この時点で分解しきれていない、validでないと判定できる場合はルートシーケントノードのvaildフラグを偽にする.
 	if !e {
@@ -220,8 +220,6 @@ func parseSeq(r *node, n *node) int {
 	for _, c := range n.child {
 		parseSeq(r, c)
 	}
-
-	return 0
 }
 
 // proveは実質的な主処理である.
