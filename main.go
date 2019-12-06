@@ -11,7 +11,7 @@ import (
 	"github.com/ToruMakabe/lk-prover/pfparser"
 )
 
-const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
 
 // nodeはシーケントを格納する構造体である.
 type node struct {
@@ -22,7 +22,7 @@ type node struct {
 	valid       bool
 }
 
-// walkはシーケントが格納されたツリーを深さ優先で探索し、ノードの前提と結論を、もし存在すれば親ノードの前提と結論も表示する.
+// walkはシーケントが格納されたツリーを深さ優先で探索し,ノードの前提と結論を,親ノードが存在すればその前提と結論も表示する.
 func walk(n node) {
 	if n.parent == nil {
 		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
@@ -39,7 +39,7 @@ func walk(n node) {
 	}
 }
 
-// isValidは前提と結論がリテラルのみで、かつ前提と結論に同じリテラルが含まれるか、つまり証明可能なシーケントかを判定する.
+// isValidは前提と結論がリテラルのみで,かつ前提と結論に同じリテラルが含まれるか,つまり恒真で証明可能なシーケントかを判定する.
 func isValid(a []string, c []string) bool {
 	m := make(map[string]bool)
 	var (
@@ -83,7 +83,7 @@ func isValid(a []string, c []string) bool {
 // decomposeは規則に従ってシーケントを分解する.
 func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string, error) {
 
-	// pfparser.PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため、Goのパッケージは分割).
+	// pfparser.PfParseは命題論理式を構文解析し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
 	pf, err := pfparser.PfParse(l)
 	if err != nil {
 		return "", nil, nil, err
@@ -223,7 +223,7 @@ func parseSeq(r *node, n *node) error {
 	if err != nil {
 		return err
 	}
-	// 解析の結果、この時点で分解しきれていない、恒真でないと判定できる場合はルートシーケントノードのvaildフラグを偽にする.
+	// 解析の結果,この時点で分解しきれていない,恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
 	if !e {
 		r.valid = false
 	}
@@ -244,7 +244,7 @@ func prove() int {
 	fmt.Print("Sequent? ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	// シーケントを "|-" を区切り記号として、前提と結論に分解する.
+	// シーケントを "|-" を区切り記号として,前提と結論に分解する.
 	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
 	if len(s) != 2 {
@@ -275,7 +275,7 @@ func prove() int {
 	}
 	fmt.Println("conclutions: ", conclutions)
 
-	// 証明可能かを判定するのに要した時間を計測するため、開始時間を取得する.
+	// 証明可能かを判定するのに要した時間を計測するため,開始時間を取得する.
 	st := time.Now()
 
 	root := node{nil, assumptions, conclutions, nil, true}
@@ -289,7 +289,7 @@ func prove() int {
 		fmt.Println(inputFormatMsg)
 		return 1
 	}
-	// 構文解析の結果vaildなシーケントへ分解できたら、その結果を出力する.できなかった場合は "Unprovable" を出力する.
+	// 構文解析の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
 	if root.valid == true {
 		fmt.Println()
 		fmt.Println("Provable")
