@@ -22,7 +22,7 @@ type node struct {
 	valid       bool
 }
 
-// walkはシーケントが格納されたツリーを深さ優先で探索し、ノードの前提と結論を、存在すれば親ノードの前提と結論も表示する.
+// walkはシーケントが格納されたツリーを深さ優先で探索し、ノードの前提と結論を、もし存在すれば親ノードの前提と結論も表示する.
 func walk(n node) {
 	if n.parent == nil {
 		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
@@ -159,7 +159,7 @@ func evalPf(n *node) bool {
 	a := n.assumptions
 	c := n.conclutions
 
-	// すでにvalidかを判定する.
+	// すでに恒真かを判定する.
 	if isValid(a, c) {
 		n.valid = true
 		return true
@@ -211,7 +211,7 @@ func evalPf(n *node) bool {
 // parseSeqはシーケントを構文解析する.
 func parseSeq(r *node, n *node) {
 	e := evalPf(n)
-	// 解析の結果、この時点で分解しきれていない、validでないと判定できる場合はルートシーケントノードのvaildフラグを偽にする.
+	// 解析の結果、この時点で分解しきれていない、恒真でないと判定できる場合はルートシーケントノードのvaildフラグを偽にする.
 	if !e {
 		r.valid = false
 	}
@@ -295,7 +295,7 @@ func printError(err error) {
 	fmt.Fprintf(os.Stderr, err.Error()+"\n")
 }
 
-// mainはエントリーポイントと終了コードを返却する役割のみとする.
+// mainはエントリーポイントと終了コードを返す役割のみとする.
 func main() {
 	os.Exit(prove())
 }
