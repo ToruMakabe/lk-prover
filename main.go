@@ -43,7 +43,7 @@ func walk(n /* node */ node) {
 func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 	m := make(map[string]bool)
 	var (
-		s []string
+		f []string
 		u []string
 	)
 
@@ -51,14 +51,14 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 	re := regexp.MustCompile(`^[A-Z]$`)
 
 	// 前提にあるリテラルの重複を削除する.
-	s = append(a)
-	for _, e := range s {
-		if re.FindStringSubmatch(e) == nil {
+	f = append(a)
+	for _, key := range f {
+		if re.FindStringSubmatch(key) == nil {
 			return false
 		}
-		if !m[e] {
-			m[e] = true
-			u = append(u, e)
+		if !m[key] {
+			m[key] = true
+			u = append(u, key)
 		}
 	}
 
@@ -84,21 +84,21 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 func decompose(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
 
 	// pfparser.PfParseは命題論理式を構文解析し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
-	pf, err := pfparser.PfParse(f)
+	r, err := pfparser.PfParse(f)
 	if err != nil {
 		return "", nil, nil, err
 	}
 
-	conn := pf[1]
-	v1 := pf[0]
-	v2 := pf[2]
+	conn := r[1]
+	v1 := r[0]
+	v2 := r[2]
 
 	var (
 		rv1 [][]string
 		rv2 [][]string
 	)
 
-	if pf == nil {
+	if r == nil {
 		return "", nil, nil, nil
 	}
 
@@ -219,12 +219,12 @@ func evalPf(n /* node */ *node) (bool, error) {
 
 // parseSeqはシーケントを構文解析する.
 func parseSeq(r /* root */ *node, n /* node */ *node) error {
-	e, err := evalPf(n)
+	res, err := evalPf(n)
 	if err != nil {
 		return err
 	}
 	// 解析の結果,この時点で分解しきれていない,恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
-	if !e {
+	if !res {
 		r.valid = false
 	}
 
