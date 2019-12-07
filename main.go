@@ -157,7 +157,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 	return "", nil, nil, nil
 }
 
-// evalPfは命題論理式の集合を構文解析する.
+// evalPfは命題論理式を構文解析する.
 func evalPf(n *node) (bool, error) {
 	a := n.assumptions
 	c := n.conclutions
@@ -168,7 +168,7 @@ func evalPf(n *node) (bool, error) {
 		return true, nil
 	}
 
-	// シーケントの前提を構成する命題論理式の集合を解析する.
+	// シーケントの前提を構成する命題論理式を解析する.
 	for i, s := range a {
 		var t []string
 		t = append(t, a[:i]...)
@@ -191,7 +191,7 @@ func evalPf(n *node) (bool, error) {
 		}
 	}
 
-	// シーケントの結論を構成する命題論理式の集合を解析する.
+	// シーケントの結論を構成する命題論理式を解析する.
 	for i, s := range c {
 		var t []string
 		t = append(t, c[:i]...)
@@ -255,7 +255,7 @@ func prove() int {
 		return 1
 	}
 
-	// 前提の命題論理式の集合を "," を区切り記号としてスライスに格納する.
+	// 前提の命題論理式を "," を区切り記号としてスライスに格納する.
 	as := strings.Split(s[0], ",")
 	var assumptions []string
 	if as[0] != "" {
@@ -265,7 +265,7 @@ func prove() int {
 	}
 	fmt.Println("assumptions: ", assumptions)
 
-	// 結論の命題論理式の集合を "," を区切り記号としてスライスに格納する.
+	// 結論の命題論理式を "," を区切り記号としてスライスに格納する.
 	cs := strings.Split(s[1], ",")
 	var conclutions []string
 	if cs[0] != "" {
