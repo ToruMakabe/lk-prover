@@ -23,7 +23,7 @@ type node struct {
 }
 
 // walkはシーケントが格納されたツリーを深さ優先で探索し,ノードの前提と結論を,親ノードが存在すればその前提と結論も表示する.
-func walk(n node) {
+func walk(n /* node */ node) {
 	if n.parent == nil {
 		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
 	} else {
@@ -40,7 +40,7 @@ func walk(n node) {
 }
 
 // isValidは前提と結論がリテラルのみで,かつ前提と結論に同じリテラルが含まれるか,つまり恒真で証明可能なシーケントかを判定する.
-func isValid(a []string, c []string) bool {
+func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 	m := make(map[string]bool)
 	var (
 		s []string
@@ -81,10 +81,10 @@ func isValid(a []string, c []string) bool {
 }
 
 // decomposeは規則に従ってシーケントを分解する.
-func decompose(l string, p string, a []string, c []string) (string, [][]string, [][]string, error) {
+func decompose(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
 
 	// pfparser.PfParseは命題論理式を構文解析し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
-	pf, err := pfparser.PfParse(l)
+	pf, err := pfparser.PfParse(f)
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -158,7 +158,7 @@ func decompose(l string, p string, a []string, c []string) (string, [][]string, 
 }
 
 // evalPfは命題論理式を構文解析する.
-func evalPf(n *node) (bool, error) {
+func evalPf(n /* node */ *node) (bool, error) {
 	a := n.assumptions
 	c := n.conclutions
 
@@ -169,12 +169,12 @@ func evalPf(n *node) (bool, error) {
 	}
 
 	// シーケントの前提を構成する命題論理式を解析する.
-	for i, s := range a {
+	for i, f := range a {
 		var t []string
 		t = append(t, a[:i]...)
 		t = append(t, a[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(s, "a", t, c)
+		conn, d1, d2, err := decompose(f, "a", t, c)
 		if err != nil {
 			return false, err
 		}
@@ -192,12 +192,12 @@ func evalPf(n *node) (bool, error) {
 	}
 
 	// シーケントの結論を構成する命題論理式を解析する.
-	for i, s := range c {
+	for i, f := range c {
 		var t []string
 		t = append(t, c[:i]...)
 		t = append(t, c[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(s, "c", a, t)
+		conn, d1, d2, err := decompose(f, "c", a, t)
 		if err != nil {
 			return false, err
 		}
@@ -218,7 +218,7 @@ func evalPf(n *node) (bool, error) {
 }
 
 // parseSeqはシーケントを構文解析する.
-func parseSeq(r *node, n *node) error {
+func parseSeq(r /* root */ *node, n /* node */ *node) error {
 	e, err := evalPf(n)
 	if err != nil {
 		return err
@@ -312,7 +312,7 @@ func prove() int {
 }
 
 // printErrorはエラーメッセージ出力を統一する.
-func printError(err error) {
+func printError(err /* error */ error) {
 	fmt.Fprintf(os.Stderr, err.Error()+"\n")
 }
 
