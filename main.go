@@ -22,21 +22,158 @@ type node struct {
 	valid       bool
 }
 
-// walkはシーケントが格納されたツリーを深さ優先で探索し,ノードの前提と結論を,親ノードが存在すればその前提と結論も表示する.
-func walk(n /* node */ node) {
-	if n.parent == nil {
-		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
+// proveは実質的な主処理である.
+func prove() int {
+
+	// シーケントの入力を促す.
+	fmt.Println(inputFormatMsg)
+	fmt.Print("Sequent? ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	// シーケントを "|-" を区切り記号として,前提と結論に分解する.
+	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
+
+	if len(s) != 2 {
+		fmt.Println()
+		printError(fmt.Errorf("syntax srror"))
+		fmt.Println()
+		fmt.Println(inputFormatMsg)
+		return 1
+	}
+
+	// 前提の命題論理式を "," を区切り記号としてスライスに格納する.
+	as := strings.Split(s[0], ",")
+	var assumptions []string
+	if as[0] != "" {
+		for _, a := range as {
+			assumptions = append(assumptions, a)
+		}
+	}
+	fmt.Println("assumptions: ", assumptions)
+
+	// 結論の命題論理式を "," を区切り記号としてスライスに格納する.
+	cs := strings.Split(s[1], ",")
+	var conclutions []string
+	if cs[0] != "" {
+		for _, c := range cs {
+			conclutions = append(conclutions, c)
+		}
+	}
+	fmt.Println("conclutions: ", conclutions)
+
+	// 証明可能かを判定するのに要した時間を計測するため,開始時間を取得する.
+	st := time.Now()
+
+	root := node{nil, assumptions, conclutions, nil, true}
+
+	// シーケントの構文解析を行う.
+	err := parseSeq(&root, &root)
+	if err != nil {
+		fmt.Println()
+		printError(err)
+		fmt.Println()
+		fmt.Println(inputFormatMsg)
+		return 1
+	}
+	// 構文解析の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
+	if root.valid == true {
+		fmt.Println()
+		fmt.Println("Provable")
+		fmt.Println()
+		fmt.Println("*** Root of sequent tree ***")
+		walk(root)
+		fmt.Println("*** End of sequent tree ***")
+		fmt.Println()
 	} else {
-		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
+		fmt.Println()
+		fmt.Println("Unprovable")
+		fmt.Println()
 	}
 
-	if n.child == nil {
-		fmt.Println("** End of branch **")
+	// 証明可能かを判定するのに要した時間を表示する.
+	et := time.Now()
+	fmt.Println("Time: ", et.Sub(st))
+
+	return 0
+}
+
+// parseSeqはシーケントを構文解析する.
+func parseSeq(r /* root */ *node, n /* node */ *node) error {
+	res, err := evalPf(n)
+	if err != nil {
+		return err
+	}
+	// 解析の結果,この時点で分解しきれていない,恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
+	if !res {
+		r.valid = false
 	}
 
+	// 再帰的に子ノードのシーケントを構文解析する.
 	for _, c := range n.child {
-		walk(*c)
+		parseSeq(r, c)
 	}
+
+	return nil
+}
+
+// evalPfは命題論理式を構文解析する.
+func evalPf(n /* node */ *node) (bool, error) {
+	a := n.assumptions
+	c := n.conclutions
+
+	// すでに恒真かを判定する.
+	if isValid(a, c) {
+		n.valid = true
+		return true, nil
+	}
+
+	// シーケントの前提を構成する命題論理式を解析する.
+	for i, f := range a {
+		var t []string
+		t = append(t, a[:i]...)
+		t = append(t, a[i+1:]...)
+		// 分解できるかを判定する.
+		conn, d1, d2, err := decompose(f, "a", t, c)
+		if err != nil {
+			return false, err
+		}
+		// 分解できれば子として追加する.
+		if conn != "" {
+			child := node{n, d1[0], d1[1], nil, false}
+			n.child = append(n.child, &child)
+			// 2式に分解された場合.
+			if d2 != nil {
+				child := node{n, d2[0], d2[1], nil, false}
+				n.child = append(n.child, &child)
+			}
+			return true, nil
+		}
+	}
+
+	// シーケントの結論を構成する命題論理式を解析する.
+	for i, f := range c {
+		var t []string
+		t = append(t, c[:i]...)
+		t = append(t, c[i+1:]...)
+		// 分解できるかを判定する.
+		conn, d1, d2, err := decompose(f, "c", a, t)
+		if err != nil {
+			return false, err
+		}
+		// 分解できれば子として追加する.
+		if conn != "" {
+			child := node{n, d1[0], d1[1], nil, false}
+			n.child = append(n.child, &child)
+			// 2式に分解された場合.
+			if d2 != nil {
+				child := node{n, d2[0], d2[1], nil, false}
+				n.child = append(n.child, &child)
+			}
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // isValidは前提と結論がリテラルのみで,かつ前提と結論に同じリテラルが含まれるか,つまり恒真で証明可能なシーケントかを判定する.
@@ -157,158 +294,21 @@ func decompose(f /* formula */ string, p /* position */ string, a /* assumptions
 	return "", nil, nil, nil
 }
 
-// evalPfは命題論理式を構文解析する.
-func evalPf(n /* node */ *node) (bool, error) {
-	a := n.assumptions
-	c := n.conclutions
-
-	// すでに恒真かを判定する.
-	if isValid(a, c) {
-		n.valid = true
-		return true, nil
-	}
-
-	// シーケントの前提を構成する命題論理式を解析する.
-	for i, f := range a {
-		var t []string
-		t = append(t, a[:i]...)
-		t = append(t, a[i+1:]...)
-		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(f, "a", t, c)
-		if err != nil {
-			return false, err
-		}
-		// 分解できれば子として追加する.
-		if conn != "" {
-			child := node{n, d1[0], d1[1], nil, false}
-			n.child = append(n.child, &child)
-			// 2式に分解された場合.
-			if d2 != nil {
-				child := node{n, d2[0], d2[1], nil, false}
-				n.child = append(n.child, &child)
-			}
-			return true, nil
-		}
-	}
-
-	// シーケントの結論を構成する命題論理式を解析する.
-	for i, f := range c {
-		var t []string
-		t = append(t, c[:i]...)
-		t = append(t, c[i+1:]...)
-		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(f, "c", a, t)
-		if err != nil {
-			return false, err
-		}
-		// 分解できれば子として追加する.
-		if conn != "" {
-			child := node{n, d1[0], d1[1], nil, false}
-			n.child = append(n.child, &child)
-			// 2式に分解された場合.
-			if d2 != nil {
-				child := node{n, d2[0], d2[1], nil, false}
-				n.child = append(n.child, &child)
-			}
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-// parseSeqはシーケントを構文解析する.
-func parseSeq(r /* root */ *node, n /* node */ *node) error {
-	res, err := evalPf(n)
-	if err != nil {
-		return err
-	}
-	// 解析の結果,この時点で分解しきれていない,恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
-	if !res {
-		r.valid = false
-	}
-
-	// 再帰的に子ノードのシーケントを構文解析する.
-	for _, c := range n.child {
-		parseSeq(r, c)
-	}
-
-	return nil
-}
-
-// proveは実質的な主処理である.
-func prove() int {
-
-	// シーケントの入力を促す.
-	fmt.Println(inputFormatMsg)
-	fmt.Print("Sequent? ")
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	// シーケントを "|-" を区切り記号として,前提と結論に分解する.
-	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
-
-	if len(s) != 2 {
-		fmt.Println()
-		printError(fmt.Errorf("syntax srror"))
-		fmt.Println()
-		fmt.Println(inputFormatMsg)
-		return 1
-	}
-
-	// 前提の命題論理式を "," を区切り記号としてスライスに格納する.
-	as := strings.Split(s[0], ",")
-	var assumptions []string
-	if as[0] != "" {
-		for _, a := range as {
-			assumptions = append(assumptions, a)
-		}
-	}
-	fmt.Println("assumptions: ", assumptions)
-
-	// 結論の命題論理式を "," を区切り記号としてスライスに格納する.
-	cs := strings.Split(s[1], ",")
-	var conclutions []string
-	if cs[0] != "" {
-		for _, c := range cs {
-			conclutions = append(conclutions, c)
-		}
-	}
-	fmt.Println("conclutions: ", conclutions)
-
-	// 証明可能かを判定するのに要した時間を計測するため,開始時間を取得する.
-	st := time.Now()
-
-	root := node{nil, assumptions, conclutions, nil, true}
-
-	// シーケントの構文解析を行う.
-	err := parseSeq(&root, &root)
-	if err != nil {
-		fmt.Println()
-		printError(err)
-		fmt.Println()
-		fmt.Println(inputFormatMsg)
-		return 1
-	}
-	// 構文解析の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
-	if root.valid == true {
-		fmt.Println()
-		fmt.Println("Provable")
-		fmt.Println()
-		fmt.Println("*** Root of sequent tree ***")
-		walk(root)
-		fmt.Println("*** End of sequent tree ***")
-		fmt.Println()
+// walkはシーケントが格納されたツリーを深さ優先で探索し,ノードの前提と結論を,親ノードが存在すればその前提と結論も表示する.
+func walk(n /* node */ node) {
+	if n.parent == nil {
+		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
 	} else {
-		fmt.Println()
-		fmt.Println("Unprovable")
-		fmt.Println()
+		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
 	}
 
-	// 証明可能かを判定するのに要した時間を表示する.
-	et := time.Now()
-	fmt.Println("Time: ", et.Sub(st))
+	if n.child == nil {
+		fmt.Println("** End of branch **")
+	}
 
-	return 0
+	for _, c := range n.child {
+		walk(*c)
+	}
 }
 
 // printErrorはエラーメッセージ出力を統一する.

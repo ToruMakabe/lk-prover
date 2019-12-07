@@ -99,22 +99,6 @@ func Parse(r /* reader */ io.Reader) (Expression, error) {
 
 // 字句解析器(Lexer)とyaccを用いた構文解析関数(ここまで)
 
-// Evalはyaccで作成した構文木を文字列に変換する.
-func Eval(e /* expression */ Expression) string {
-	switch e.(type) {
-	case BinOpExpr:
-		left := Eval(e.(BinOpExpr).Left)
-		right := Eval(e.(BinOpExpr).Right)
-		return "(" + left + string(rune(e.(BinOpExpr).Operator)) + right + ")"
-	case NotOpExpr:
-		return "(" + string(rune(e.(NotOpExpr).Operator)) + Eval(e.(NotOpExpr).Right) + ")"
-	case Literal:
-		return e.(Literal).Literal
-	default:
-		return ""
-	}
-}
-
 // PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
 func PfParse(pf /* propositional formula */ string) ([]string, error) {
 	r := strings.NewReader(pf)
@@ -138,6 +122,22 @@ func PfParse(pf /* propositional formula */ string) ([]string, error) {
 		return []string{v1, "", ""}, nil
 	}
 	return nil, nil
+}
+
+// Evalはyaccで作成した構文木を文字列に変換する.
+func Eval(e /* expression */ Expression) string {
+	switch e.(type) {
+	case BinOpExpr:
+		left := Eval(e.(BinOpExpr).Left)
+		right := Eval(e.(BinOpExpr).Right)
+		return "(" + left + string(rune(e.(BinOpExpr).Operator)) + right + ")"
+	case NotOpExpr:
+		return "(" + string(rune(e.(NotOpExpr).Operator)) + Eval(e.(NotOpExpr).Right) + ")"
+	case Literal:
+		return e.(Literal).Literal
+	default:
+		return ""
+	}
 }
 
 //line yacctab:1
