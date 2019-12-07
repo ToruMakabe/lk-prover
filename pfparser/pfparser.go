@@ -74,7 +74,7 @@ type Lexer struct {
 	err    error
 }
 
-func (l *Lexer) Lex(lval *yySymType) int {
+func (l *Lexer) Lex(lval /* lexer value */ *yySymType) int {
 	token := int(l.Scan())
 	if token == scanner.Ident {
 		token = LITERAL
@@ -83,11 +83,11 @@ func (l *Lexer) Lex(lval *yySymType) int {
 	return token
 }
 
-func (l *Lexer) Error(e string) {
+func (l *Lexer) Error(e /* error */ string) {
 	l.err = errors.New(e)
 }
 
-func Parse(r io.Reader) (Expression, error) {
+func Parse(r /* reader */ io.Reader) (Expression, error) {
 	l := new(Lexer)
 	l.Init(r)
 	yyParse(l)
@@ -100,7 +100,7 @@ func Parse(r io.Reader) (Expression, error) {
 // 字句解析器(Lexer)とyaccを用いた構文解析関数(ここまで)
 
 // Evalはyaccで作成した構文木を文字列に変換する.
-func Eval(e Expression) string {
+func Eval(e /* expression */ Expression) string {
 	switch e.(type) {
 	case BinOpExpr:
 		left := Eval(e.(BinOpExpr).Left)
@@ -116,7 +116,7 @@ func Eval(e Expression) string {
 }
 
 // PfParseは命題論理式を構文解析し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
-func PfParse(pf string) ([]string, error) {
+func PfParse(pf /* propositional formula */ string) ([]string, error) {
 	r := strings.NewReader(pf)
 	// yaccで構文木を作成する.
 	p, err := Parse(r)
