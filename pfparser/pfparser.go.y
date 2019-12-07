@@ -39,7 +39,7 @@ type BinOpExpr struct {
 }
 
 %type<expr> formula
-%type<expr> expr and_expr or_expr not_expr imply_expr paren_expr
+%type<expr> expr and_expr or_expr not_expr imply_expr parenth_expr
 %token<token> LITERAL
 
 %left '&' '|' '>'
@@ -64,7 +64,7 @@ expr
 	| or_expr
 	| imply_expr
 	| not_expr
-	| paren_expr
+	| parenth_expr
 
 and_expr
 	: expr '&' expr
@@ -90,7 +90,7 @@ not_expr
 		$$ = NotOpExpr{Operator: '~', Right: $2}
 	}
 
-paren_expr
+parenth_expr
 	: '(' expr ')'
 	{
 		$$ = $2
