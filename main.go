@@ -11,7 +11,7 @@ import (
 	"github.com/ToruMakabe/lk-prover/pfparser"
 )
 
-const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation:~, And:&, Or:|, Implication:>\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation: ~, And: &, Or: |, Imply: >\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
 
 // nodeはシーケントを格納する構造体である.
 type node struct {

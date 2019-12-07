@@ -12,7 +12,7 @@ state 0
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 1
@@ -26,7 +26,7 @@ state 2
 	formula:  expr.    (1)
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
-	impl_expr:  expr.'>' expr 
+	imply_expr:  expr.'>' expr 
 
 	'&'  shift 11
 	'|'  shift 12
@@ -53,7 +53,7 @@ state 5
 
 
 state 6
-	expr:  impl_expr.    (5)
+	expr:  imply_expr.    (5)
 
 	.  reduce 5 (src line 65)
 
@@ -82,7 +82,7 @@ state 9
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 10
@@ -97,7 +97,7 @@ state 10
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 11
@@ -112,7 +112,7 @@ state 11
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 12
@@ -127,11 +127,11 @@ state 12
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 13
-	impl_expr:  expr '>'.expr 
+	imply_expr:  expr '>'.expr 
 
 	LITERAL  shift 3
 	'~'  shift 9
@@ -142,13 +142,13 @@ state 13
 	and_expr  goto 4
 	or_expr  goto 5
 	not_expr  goto 7
-	impl_expr  goto 6
+	imply_expr  goto 6
 	paren_expr  goto 8
 
 state 14
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
-	impl_expr:  expr.'>' expr 
+	imply_expr:  expr.'>' expr 
 	not_expr:  '~' expr.    (11)
 
 	.  reduce 11 (src line 87)
@@ -157,7 +157,7 @@ state 14
 state 15
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
-	impl_expr:  expr.'>' expr 
+	imply_expr:  expr.'>' expr 
 	paren_expr:  '(' expr.')' 
 
 	'&'  shift 11
@@ -171,7 +171,7 @@ state 16
 	and_expr:  expr.'&' expr 
 	and_expr:  expr '&' expr.    (8)
 	or_expr:  expr.'|' expr 
-	impl_expr:  expr.'>' expr 
+	imply_expr:  expr.'>' expr 
 
 	.  reduce 8 (src line 69)
 
@@ -180,7 +180,7 @@ state 17
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
 	or_expr:  expr '|' expr.    (9)
-	impl_expr:  expr.'>' expr 
+	imply_expr:  expr.'>' expr 
 
 	.  reduce 9 (src line 75)
 
@@ -188,8 +188,8 @@ state 17
 state 18
 	and_expr:  expr.'&' expr 
 	or_expr:  expr.'|' expr 
-	impl_expr:  expr.'>' expr 
-	impl_expr:  expr '>' expr.    (10)
+	imply_expr:  expr.'>' expr 
+	imply_expr:  expr '>' expr.    (10)
 
 	.  reduce 10 (src line 81)
 
