@@ -1,6 +1,6 @@
 // %はgoyaccの定義部
 %{
-package parser
+package formula
 
 import (
 	"errors"
@@ -96,9 +96,8 @@ parenth_expr
 	}
 
 %%
-// 以降はgoyaccのユーザー定義部. Goで記述する.
+// 以降はgoyaccのユーザー定義部. Goで字句解析器(Lexer)と構文解析器(Parser)を記述する.
 
-// 字句解析器(Lexer)とyaccを用いた構文解析関数(ここから)
 type Lexer struct {
 	scanner.Scanner
 	result Expression
@@ -127,4 +126,3 @@ func Parse(r /* reader */ io.Reader) (Expression, error) {
 	}
 	return l.result, nil
 }
-// 字句解析器(Lexer)とyaccを用いた構文解析関数(ここまで)

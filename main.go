@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ToruMakabe/lk-prover/parser"
+	"github.com/ToruMakabe/lk-prover/formula"
 )
 
 const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation: ~, And: &, Or: |, Imply: >\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
@@ -66,7 +66,7 @@ func prove() int {
 
 	root := node{nil, assumptions, conclutions, nil, true}
 
-	// シーケントの構文解析を行う.
+	// シーケントの構文解析と評価を行う.
 	err := parseSeq(&root, &root)
 	if err != nil {
 		fmt.Println()
@@ -75,7 +75,7 @@ func prove() int {
 		fmt.Println(inputFormatMsg)
 		return 1
 	}
-	// 構文解析の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
+	// 構文解析と評価の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
 	if root.valid == true {
 		fmt.Println()
 		fmt.Println("Provable")
@@ -97,7 +97,7 @@ func prove() int {
 	return 0
 }
 
-// parseSeqはシーケントを構文解析する.
+// parseSeqはシーケントを構文解析と評価する.
 func parseSeq(r /* root */ *node, n /* node */ *node) error {
 	res, err := parsePfs(n)
 	if err != nil {
@@ -108,7 +108,7 @@ func parseSeq(r /* root */ *node, n /* node */ *node) error {
 		r.valid = false
 	}
 
-	// 再帰的に子ノードのシーケントを構文解析する.
+	// 再帰的に子ノードのシーケントを構文解析と評価する.
 	for _, c := range n.child {
 		parseSeq(r, c)
 	}
@@ -116,7 +116,7 @@ func parseSeq(r /* root */ *node, n /* node */ *node) error {
 	return nil
 }
 
-// parsePfは命題論理式(列)を構文解析する.
+// parsePfsは命題論理式(列)を構文解析と評価する.
 func parsePfs(n /* node */ *node) (bool, error) {
 	a := n.assumptions
 	c := n.conclutions
@@ -220,8 +220,8 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 // decomposeSeqは規則に従ってシーケントを分解する.
 func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
 
-	// parser.EvalPfは命題論理式を構文解析と評価し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返すyaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
-	r, err := parser.EvalPf(f)
+	// formula.Evalは命題論理式を評価し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返すyaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
+	r, err := formula.Eval(f)
 	if err != nil {
 		return "", nil, nil, err
 	}
