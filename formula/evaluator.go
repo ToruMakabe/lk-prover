@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// Eval は命題論理式を評価し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)a]で返す.
+// Eval は命題論理式を評価し、根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
 func Eval(f /* formula */ string) ([]string, error) {
 	r := strings.NewReader(f)
 	// goyaccで構文木を作成する.
