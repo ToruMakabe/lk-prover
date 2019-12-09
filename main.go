@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ToruMakabe/lk-prover/pfparser"
+	"github.com/ToruMakabe/lk-prover/parser"
 )
 
 const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation: ~, And: &, Or: |, Imply: >\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
@@ -99,7 +99,7 @@ func prove() int {
 
 // parseSeqはシーケントを構文解析する.
 func parseSeq(r /* root */ *node, n /* node */ *node) error {
-	res, err := evalPf(n)
+	res, err := parsePfs(n)
 	if err != nil {
 		return err
 	}
@@ -116,8 +116,8 @@ func parseSeq(r /* root */ *node, n /* node */ *node) error {
 	return nil
 }
 
-// evalPfは命題論理式を構文解析する.
-func evalPf(n /* node */ *node) (bool, error) {
+// parsePfは命題論理式(列)を構文解析する.
+func parsePfs(n /* node */ *node) (bool, error) {
 	a := n.assumptions
 	c := n.conclutions
 
@@ -133,7 +133,7 @@ func evalPf(n /* node */ *node) (bool, error) {
 		t = append(t, a[:i]...)
 		t = append(t, a[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(f, "a", t, c)
+		conn, d1, d2, err := decomposeSeq(f, "a", t, c)
 		if err != nil {
 			return false, err
 		}
@@ -156,7 +156,7 @@ func evalPf(n /* node */ *node) (bool, error) {
 		t = append(t, c[:i]...)
 		t = append(t, c[i+1:]...)
 		// 分解できるかを判定する.
-		conn, d1, d2, err := decompose(f, "c", a, t)
+		conn, d1, d2, err := decomposeSeq(f, "c", a, t)
 		if err != nil {
 			return false, err
 		}
@@ -217,11 +217,11 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 	return false
 }
 
-// decomposeは規則に従ってシーケントを分解する.
-func decompose(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
+// decomposeSeqは規則に従ってシーケントを分解する.
+func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
 
-	// pfparser.PfParseは命題論理式を構文解析し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す. yaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
-	r, err := pfparser.PfParse(f)
+	// parser.EvalPfは命題論理式を構文解析と評価し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返すyaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
+	r, err := parser.EvalPf(f)
 	if err != nil {
 		return "", nil, nil, err
 	}
