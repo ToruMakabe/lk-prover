@@ -32,10 +32,14 @@ func prove() int {
 	scanner.Scan()
 	// シーケントを "|-" を区切り記号として, 前提と結論に分解する.
 	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
+	if err := scanner.Err(); err != nil {
+		printError(fmt.Errorf("scanner error"))
+		return 1
+	}
 
 	if len(s) != 2 {
 		fmt.Println()
-		printError(fmt.Errorf("syntax srror"))
+		printError(fmt.Errorf("syntax error"))
 		fmt.Println()
 		fmt.Println(inputFormatMsg)
 		return 1
