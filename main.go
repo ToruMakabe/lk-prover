@@ -30,7 +30,7 @@ func prove() int {
 	fmt.Print("Sequent? ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
-	// シーケントを "|-" を区切り記号として,前提と結論に分解する.
+	// シーケントを "|-" を区切り記号として, 前提と結論に分解する.
 	s := strings.Split(strings.Join(strings.Fields(scanner.Text()), ""), "|-")
 
 	if len(s) != 2 {
@@ -61,7 +61,7 @@ func prove() int {
 	}
 	fmt.Println("conclutions: ", conclutions)
 
-	// 証明可能かを判定するのに要した時間を計測するため,開始時間を取得する.
+	// 証明可能かを判定するのに要した時間を計測するため, 開始時間を取得する.
 	st := time.Now()
 
 	root := node{nil, assumptions, conclutions, nil, true}
@@ -75,7 +75,7 @@ func prove() int {
 		fmt.Println(inputFormatMsg)
 		return 1
 	}
-	// 構文解析と評価の結果,恒真なシーケントへ分解できたら,その結果を出力する.できなかった場合は "Unprovable" を出力する.
+	// 構文解析と評価の結果,恒真なシーケントへ分解できたら, その結果を出力する.できなかった場合は "Unprovable" を出力する.
 	if root.valid == true {
 		fmt.Println()
 		fmt.Println("Provable")
@@ -103,7 +103,7 @@ func parseSeq(r /* root */ *node, n /* node */ *node) error {
 	if err != nil {
 		return err
 	}
-	// 解析の結果,この時点で分解しきれていない,恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
+	// 解析の結果,この時点で分解しきれていない, 恒真でないと判定できる場合は根ノードのvalidフラグを偽にする.
 	if !res {
 		r.valid = false
 	}
@@ -176,7 +176,7 @@ func parsePfs(n /* node */ *node) (bool, error) {
 	return false, nil
 }
 
-// isValidは前提と結論がリテラルのみで,かつ前提と結論に同じリテラルが含まれるか,つまり恒真で証明可能なシーケントかを判定する.
+// isValidは前提と結論がリテラルのみで, かつ前提と結論に同じリテラルが含まれる, つまり恒真で証明可能なシーケントかを判定する.
 func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 	m := make(map[string]bool)
 	var (
@@ -220,7 +220,7 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 // decomposeSeqは規則に従ってシーケントを分解する.
 func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
 
-	// formula.Evalは命題論理式を評価し,根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返すyaccベースのプログラムである(コード量が多いため,Goのパッケージは分割している).
+	// formula.Evalは命題論理式を評価し, 根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
 	r, err := formula.Eval(f)
 	if err != nil {
 		return "", nil, nil, err
@@ -294,7 +294,7 @@ func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumpti
 	return "", nil, nil, nil
 }
 
-// walkはシーケントが格納されたツリーを深さ優先で探索し,ノードの前提と結論を,親ノードが存在すればその前提と結論も表示する.
+// walkはシーケントが格納されたツリーを深さ優先で探索し, ノードの前提と結論を, 親ノードが存在すればその前提と結論も表示する.
 func walk(n /* node */ node) {
 	if n.parent == nil {
 		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
