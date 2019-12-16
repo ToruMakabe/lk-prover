@@ -22,8 +22,8 @@ func Eval(f /* formula */ string) ([]string, error) {
 	case NotOpExpr:
 		v1 := string(rune(p.(NotOpExpr).Operator)) + flatten(p.(NotOpExpr).Right)
 		return []string{v1, "", ""}, nil
-	case Literal:
-		v1 := p.(Literal).Literal
+	case Atomic:
+		v1 := p.(Atomic).Atomic
 		return []string{v1, "", ""}, nil
 	}
 	return nil, nil
@@ -38,8 +38,8 @@ func flatten(e /* expression */ Expression) string {
 		return "(" + left + string(rune(e.(BinOpExpr).Operator)) + right + ")"
 	case NotOpExpr:
 		return "(" + string(rune(e.(NotOpExpr).Operator)) + flatten(e.(NotOpExpr).Right) + ")"
-	case Literal:
-		return e.(Literal).Literal
+	case Atomic:
+		return e.(Atomic).Atomic
 	default:
 		return ""
 	}
