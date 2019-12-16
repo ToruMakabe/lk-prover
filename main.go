@@ -65,7 +65,7 @@ func prove() int {
 	}
 	fmt.Println("conclutions: ", conclutions)
 
-	// 証明可能かを判定するのに要した時間を計測するため, 開始時間を取得する.
+	// 以降を処理時間の計測対象とする.
 	st := time.Now()
 
 	root := node{nil, assumptions, conclutions, nil, true}
