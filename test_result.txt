@@ -1,0 +1,253 @@
+(Already valid test): Provable
+*** Root of sequent tree ***
+[A B] |- [A]
+** End of branch **
+*** End of sequent tree ***
+
+(~L test): Provable
+*** Root of sequent tree ***
+[~A A] |- [B]
+[A] |- [B A]  (Parent: [~A A] |- [B])
+** End of branch **
+*** End of sequent tree ***
+
+(~R test): Provable
+*** Root of sequent tree ***
+[A] |- [~B B]
+[A B] |- [B]  (Parent: [A] |- [~B B])
+** End of branch **
+*** End of sequent tree ***
+
+(>L test): Provable
+*** Root of sequent tree ***
+[A A>B] |- [B]
+[A] |- [B A]  (Parent: [A A>B] |- [B])
+** End of branch **
+[A B] |- [B]  (Parent: [A A>B] |- [B])
+** End of branch **
+*** End of sequent tree ***
+
+(>R test): Provable
+*** Root of sequent tree ***
+[A B] |- [B A>B]
+[A B A] |- [B B]  (Parent: [A B] |- [B A>B])
+** End of branch **
+*** End of sequent tree ***
+
+(&L test): Provable
+*** Root of sequent tree ***
+[A A&B] |- [B]
+[A A B] |- [B]  (Parent: [A A&B] |- [B])
+** End of branch **
+*** End of sequent tree ***
+
+(&R test): Provable
+*** Root of sequent tree ***
+[A] |- [A A&B]
+[A] |- [A A]  (Parent: [A] |- [A A&B])
+** End of branch **
+[A] |- [A B]  (Parent: [A] |- [A A&B])
+** End of branch **
+*** End of sequent tree ***
+
+(|L test): Provable
+*** Root of sequent tree ***
+[A A|B] |- [A]
+[A A] |- [A]  (Parent: [A A|B] |- [A])
+** End of branch **
+[A A] |- [A]  (Parent: [A A|B] |- [A])
+** End of branch **
+*** End of sequent tree ***
+
+(|R test): Provable
+*** Root of sequent tree ***
+[A] |- [B A|B]
+[A] |- [B A B]  (Parent: [A] |- [B A|B])
+** End of branch **
+*** End of sequent tree ***
+
+(Complex test #1): Provable
+*** Root of sequent tree ***
+[~A&B A&B] |- [B C|D]
+[A&B (~A) B] |- [B C|D]  (Parent: [~A&B A&B] |- [B C|D])
+[(~A) B A B] |- [B C|D]  (Parent: [A&B (~A) B] |- [B C|D])
+[B A B] |- [B C|D A]  (Parent: [(~A) B A B] |- [B C|D])
+[B A B] |- [B A C D]  (Parent: [B A B] |- [B C|D A])
+** End of branch **
+*** End of sequent tree ***
+
+(Complex test #2): Provable
+*** Root of sequent tree ***
+[~A>B A&B C] |- [A>B ~A]
+[A&B C] |- [A>B ~A (~A)]  (Parent: [~A>B A&B C] |- [A>B ~A])
+[C A B] |- [A>B ~A (~A)]  (Parent: [A&B C] |- [A>B ~A (~A)])
+[C A B A] |- [~A (~A) B]  (Parent: [C A B] |- [A>B ~A (~A)])
+[C A B A A] |- [(~A) B]  (Parent: [C A B A] |- [~A (~A) B])
+[C A B A A A] |- [B]  (Parent: [C A B A A] |- [(~A) B])
+** End of branch **
+[A&B C B] |- [A>B ~A]  (Parent: [~A>B A&B C] |- [A>B ~A])
+[C B A B] |- [A>B ~A]  (Parent: [A&B C B] |- [A>B ~A])
+[C B A B A] |- [~A B]  (Parent: [C B A B] |- [A>B ~A])
+[C B A B A A] |- [B]  (Parent: [C B A B A] |- [~A B])
+** End of branch **
+*** End of sequent tree ***
+
+(Complex test #3): Provable
+*** Root of sequent tree ***
+[~(A>B) A&B C] |- [A>B ~A]
+[A&B C] |- [A>B ~A (A>B)]  (Parent: [~(A>B) A&B C] |- [A>B ~A])
+[C A B] |- [A>B ~A (A>B)]  (Parent: [A&B C] |- [A>B ~A (A>B)])
+[C A B A] |- [~A (A>B) B]  (Parent: [C A B] |- [A>B ~A (A>B)])
+[C A B A A] |- [(A>B) B]  (Parent: [C A B A] |- [~A (A>B) B])
+[C A B A A A] |- [B B]  (Parent: [C A B A A] |- [(A>B) B])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #1.1): Provable
+*** Root of sequent tree ***
+[] |- [A>(B>A)]
+[A] |- [(B>A)]  (Parent: [] |- [A>(B>A)])
+[A B] |- [A]  (Parent: [A] |- [(B>A)])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #1.2): Provable
+*** Root of sequent tree ***
+[] |- [(A>(B>C))>((A>B)>(A>C))]
+[(A>(B>C))] |- [((A>B)>(A>C))]  (Parent: [] |- [(A>(B>C))>((A>B)>(A>C))])
+[] |- [((A>B)>(A>C)) A]  (Parent: [(A>(B>C))] |- [((A>B)>(A>C))])
+[(A>B)] |- [A (A>C)]  (Parent: [] |- [((A>B)>(A>C)) A])
+[] |- [A (A>C) A]  (Parent: [(A>B)] |- [A (A>C)])
+[A] |- [A A C]  (Parent: [] |- [A (A>C) A])
+** End of branch **
+[B] |- [A (A>C)]  (Parent: [(A>B)] |- [A (A>C)])
+[B A] |- [A C]  (Parent: [B] |- [A (A>C)])
+** End of branch **
+[(B>C)] |- [((A>B)>(A>C))]  (Parent: [(A>(B>C))] |- [((A>B)>(A>C))])
+[] |- [((A>B)>(A>C)) B]  (Parent: [(B>C)] |- [((A>B)>(A>C))])
+[(A>B)] |- [B (A>C)]  (Parent: [] |- [((A>B)>(A>C)) B])
+[] |- [B (A>C) A]  (Parent: [(A>B)] |- [B (A>C)])
+[A] |- [B A C]  (Parent: [] |- [B (A>C) A])
+** End of branch **
+[B] |- [B (A>C)]  (Parent: [(A>B)] |- [B (A>C)])
+[B A] |- [B C]  (Parent: [B] |- [B (A>C)])
+** End of branch **
+[C] |- [((A>B)>(A>C))]  (Parent: [(B>C)] |- [((A>B)>(A>C))])
+[C (A>B)] |- [(A>C)]  (Parent: [C] |- [((A>B)>(A>C))])
+[C] |- [(A>C) A]  (Parent: [C (A>B)] |- [(A>C)])
+[C A] |- [A C]  (Parent: [C] |- [(A>C) A])
+** End of branch **
+[C B] |- [(A>C)]  (Parent: [C (A>B)] |- [(A>C)])
+[C B A] |- [C]  (Parent: [C B] |- [(A>C)])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #2.1): Provable
+*** Root of sequent tree ***
+[] |- [A>(A|B)]
+[A] |- [(A|B)]  (Parent: [] |- [A>(A|B)])
+[A] |- [A B]  (Parent: [A] |- [(A|B)])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #2.2): Provable
+*** Root of sequent tree ***
+[] |- [B>(A|B)]
+[B] |- [(A|B)]  (Parent: [] |- [B>(A|B)])
+[B] |- [A B]  (Parent: [B] |- [(A|B)])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #2.3): Provable
+*** Root of sequent tree ***
+[] |- [(A>C)>((B>C)>((A|B)>C))]
+[(A>C)] |- [((B>C)>((A|B)>C))]  (Parent: [] |- [(A>C)>((B>C)>((A|B)>C))])
+[] |- [((B>C)>((A|B)>C)) A]  (Parent: [(A>C)] |- [((B>C)>((A|B)>C))])
+[(B>C)] |- [A ((A|B)>C)]  (Parent: [] |- [((B>C)>((A|B)>C)) A])
+[] |- [A ((A|B)>C) B]  (Parent: [(B>C)] |- [A ((A|B)>C)])
+[(A|B)] |- [A B C]  (Parent: [] |- [A ((A|B)>C) B])
+[A] |- [A B C]  (Parent: [(A|B)] |- [A B C])
+** End of branch **
+[A B C A] |- [A B C]  (Parent: [(A|B)] |- [A B C])
+** End of branch **
+[C] |- [A ((A|B)>C)]  (Parent: [(B>C)] |- [A ((A|B)>C)])
+[C (A|B)] |- [A C]  (Parent: [C] |- [A ((A|B)>C)])
+[C A] |- [A C]  (Parent: [C (A|B)] |- [A C])
+** End of branch **
+[A C A] |- [A C]  (Parent: [C (A|B)] |- [A C])
+** End of branch **
+[C] |- [((B>C)>((A|B)>C))]  (Parent: [(A>C)] |- [((B>C)>((A|B)>C))])
+[C (B>C)] |- [((A|B)>C)]  (Parent: [C] |- [((B>C)>((A|B)>C))])
+[C] |- [((A|B)>C) B]  (Parent: [C (B>C)] |- [((A|B)>C)])
+[C (A|B)] |- [B C]  (Parent: [C] |- [((A|B)>C) B])
+[C A] |- [B C]  (Parent: [C (A|B)] |- [B C])
+** End of branch **
+[B C A] |- [B C]  (Parent: [C (A|B)] |- [B C])
+** End of branch **
+[C C] |- [((A|B)>C)]  (Parent: [C (B>C)] |- [((A|B)>C)])
+[C C (A|B)] |- [C]  (Parent: [C C] |- [((A|B)>C)])
+[C C A] |- [C]  (Parent: [C C (A|B)] |- [C])
+** End of branch **
+[C A] |- [C]  (Parent: [C C (A|B)] |- [C])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #3.1): Provable
+*** Root of sequent tree ***
+[] |- [(A&B)>A]
+[(A&B)] |- [A]  (Parent: [] |- [(A&B)>A])
+[A B] |- [A]  (Parent: [(A&B)] |- [A])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #3.2): Provable
+*** Root of sequent tree ***
+[] |- [(A&B)>B]
+[(A&B)] |- [B]  (Parent: [] |- [(A&B)>B])
+[A B] |- [B]  (Parent: [(A&B)] |- [B])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #4.1): Provable
+*** Root of sequent tree ***
+[] |- [(A>B)>((A>~B)>~A)]
+[(A>B)] |- [((A>(~B))>(~A))]  (Parent: [] |- [(A>B)>((A>~B)>~A)])
+[] |- [((A>(~B))>(~A)) A]  (Parent: [(A>B)] |- [((A>(~B))>(~A))])
+[(A>(~B))] |- [A (~A)]  (Parent: [] |- [((A>(~B))>(~A)) A])
+[] |- [A (~A) A]  (Parent: [(A>(~B))] |- [A (~A)])
+[A] |- [A A]  (Parent: [] |- [A (~A) A])
+** End of branch **
+[(~B)] |- [A (~A)]  (Parent: [(A>(~B))] |- [A (~A)])
+[] |- [A (~A) B]  (Parent: [(~B)] |- [A (~A)])
+[A] |- [A B]  (Parent: [] |- [A (~A) B])
+** End of branch **
+[B] |- [((A>(~B))>(~A))]  (Parent: [(A>B)] |- [((A>(~B))>(~A))])
+[B (A>(~B))] |- [(~A)]  (Parent: [B] |- [((A>(~B))>(~A))])
+[B] |- [(~A) A]  (Parent: [B (A>(~B))] |- [(~A)])
+[B A] |- [A]  (Parent: [B] |- [(~A) A])
+** End of branch **
+[B (~B)] |- [(~A)]  (Parent: [B (A>(~B))] |- [(~A)])
+[B] |- [(~A) B]  (Parent: [B (~B)] |- [(~A)])
+[B A] |- [B]  (Parent: [B] |- [(~A) B])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #4.2): Provable
+*** Root of sequent tree ***
+[] |- [A>(~A>B)]
+[A] |- [((~A)>B)]  (Parent: [] |- [A>(~A>B)])
+[A (~A)] |- [B]  (Parent: [A] |- [((~A)>B)])
+[A] |- [B A]  (Parent: [A (~A)] |- [B])
+** End of branch **
+*** End of sequent tree ***
+
+(Hilbert axiom test #4.3): Provable
+*** Root of sequent tree ***
+[] |- [A|~A]
+[] |- [A (~A)]  (Parent: [] |- [A|~A])
+[A] |- [A]  (Parent: [] |- [A (~A)])
+** End of branch **
+*** End of sequent tree ***
+
+PASS
+ok  	github.com/ToruMakabe/lk-prover	0.064s

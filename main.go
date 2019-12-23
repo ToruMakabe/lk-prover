@@ -11,13 +11,13 @@ import (
 	"github.com/ToruMakabe/lk-prover/formula"
 )
 
-const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclutions)\nPropositional variables: A-Z\nNagation: ~, And: &, Or: |, Imply: >\nYou can specify multiple assumtions/conclutions delimitted by comma\nSample: A&B,C |- A,B\n"
+const inputFormatMsg = "Please input LK sequent as (assumptions) |- (conclusions)\nPropositional variables: A-Z\nNegation: ~, And: &, Or: |, Imply: >\nYou can specify multiple assumptions/conclusions delimited by comma\nSample: A&B,C |- A,B\n"
 
 // nodeはシーケントを格納する構造体である.
 type node struct {
 	parent      *node
 	assumptions []string
-	conclutions []string
+	conclusions []string
 	child       []*node
 	valid       bool
 }
@@ -45,6 +45,9 @@ func prove() int {
 		return 1
 	}
 
+	// 以降を処理時間の計測対象とする.
+	st := time.Now()
+
 	// 前提の命題論理式を "," を区切り記号としてスライスに格納する.
 	as := strings.Split(s[0], ",")
 	var assumptions []string
@@ -57,18 +60,15 @@ func prove() int {
 
 	// 結論の命題論理式を "," を区切り記号としてスライスに格納する.
 	cs := strings.Split(s[1], ",")
-	var conclutions []string
+	var conclusions []string
 	if cs[0] != "" {
 		for _, c := range cs {
-			conclutions = append(conclutions, c)
+			conclusions = append(conclusions, c)
 		}
 	}
-	fmt.Println("conclutions: ", conclutions)
+	fmt.Println("conclusions: ", conclusions)
 
-	// 以降を処理時間の計測対象とする.
-	st := time.Now()
-
-	root := node{nil, assumptions, conclutions, nil, true}
+	root := node{nil, assumptions, conclusions, nil, true}
 
 	// シーケントの構文解析と評価を行う.
 	err := parseSeq(&root, &root)
@@ -123,7 +123,7 @@ func parseSeq(r /* root */ *node, n /* node */ *node) error {
 // parsePfsは命題論理式(列)を構文解析と評価する.
 func parsePfs(n /* node */ *node) (bool, error) {
 	a := n.assumptions
-	c := n.conclutions
+	c := n.conclusions
 
 	// すでに恒真かを判定する.
 	if isValid(a, c) {
@@ -180,18 +180,18 @@ func parsePfs(n /* node */ *node) (bool, error) {
 	return false, nil
 }
 
-// isValidは前提と結論がリテラルのみで, かつ前提と結論に同じリテラルが含まれる, つまり恒真で証明可能なシーケントかを判定する.
-func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
+// isValidは前提と結論がアトミックのみで, かつ前提と結論に同じアトミックが含まれる, つまり恒真で証明可能なシーケントかを判定する.
+func isValid(a /* assumptions */ []string, c /* conclusions */ []string) bool {
 	m := make(map[string]bool)
 	var (
 		f []string
 		u []string
 	)
 
-	// リテラルはAからZまでの1文字であるかで判定する.
+	// アトミックはAからZまでの1文字であるかで判定する.
 	re := regexp.MustCompile(`^[A-Z]$`)
 
-	// 前提にあるリテラルの重複を削除する.
+	// 前提にあるアトミックの重複を削除する.
 	f = append(a)
 	for _, key := range f {
 		if re.FindStringSubmatch(key) == nil {
@@ -203,7 +203,7 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 		}
 	}
 
-	// 前提と結論のリテラルに同じものがあるかを確認する.
+	// 前提と結論のアトミックに同じものがあるかを確認する.
 	v := false
 	for _, i := range u {
 		for _, j := range c {
@@ -222,7 +222,7 @@ func isValid(a /* assumptions */ []string, c /* conclutions */ []string) bool {
 }
 
 // decomposeSeqは規則に従ってシーケントを分解する.
-func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclutions */ []string) (string, [][]string, [][]string, error) {
+func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumptions */ []string, c /* conclusions */ []string) (string, [][]string, [][]string, error) {
 
 	// formula.Evalは命題論理式を評価し, 根に論理結合子があれば [(否定)v1] [論理結合子] [v2]の形式で返す. 論理結合子がなければ [(否定)v1]で返す.
 	r, err := formula.Eval(f)
@@ -301,9 +301,9 @@ func decomposeSeq(f /* formula */ string, p /* position */ string, a /* assumpti
 // walkはシーケントが格納されたツリーを深さ優先で探索し, ノードの前提と結論を, 親ノードが存在すればその前提と結論も表示する.
 func walk(n /* node */ node) {
 	if n.parent == nil {
-		fmt.Printf("%v |- %v\n", n.assumptions, n.conclutions)
+		fmt.Printf("%v |- %v\n", n.assumptions, n.conclusions)
 	} else {
-		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclutions, n.parent.assumptions, n.parent.conclutions)
+		fmt.Printf("%v |- %v  (Parent: %v |- %v)\n", n.assumptions, n.conclusions, n.parent.assumptions, n.parent.conclusions)
 	}
 
 	if n.child == nil {
